@@ -9,9 +9,9 @@ const MainLayout = () => {
 
   return (
     <div className="relative w-full min-h-screen">
-      <div className="fixed top-0 w-full z-50">
+      <div className="fixed top-0 w-full z-30">
         {showBanner && <Banner setShowBanner={setShowBanner} />}
-        <Navbar />
+        <Navbar showBanner={showBanner} />
       </div>
       <Outlet />
     </div>

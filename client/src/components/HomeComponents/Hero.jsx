@@ -2,6 +2,7 @@ import { ImageUrl } from "../../assets/heroImages";
 import { TbArrowGuide } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa";
 import { TbBolt, TbShieldCheck } from "react-icons/tb";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -22,9 +23,9 @@ const Hero = () => {
             <path
               d="M1 6.5h14M9.5 1 15 6.5 9.5 12"
               stroke="#fff"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </span>
@@ -36,7 +37,7 @@ const Hero = () => {
       <p className="mt-4 text-center text-gray-600 max-w-md text-sm sm:text-base leading-relaxed">
         Describe anything you imagine and let our AI instantly transform your words into beautiful, high-quality images.
       </p>
-      <button
+      <Link to='/generate'
         className="mt-8 bg-linear-to-r from-[#05e056] to-[#04aa42] 
         text-white px-6 pr-2.5 py-2.5 rounded-full text-sm font-medium 
         flex items-center space-x-2 
@@ -56,12 +57,12 @@ const Hero = () => {
           <path
             d="M4.821 11.999h13.43m0 0-6.714-6.715m6.715 6.715-6.715 6.715"
             stroke="#fff"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
-      </button>
+      </Link>
 
       <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-gray-600">
         <div className="flex items-center gap-2">
