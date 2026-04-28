@@ -42,19 +42,19 @@ const Promptbox = () => {
   }, [prompt]);
 
   return (
-    <div className="flex flex-col items-center px-6 sm:px-18 py-16 md:py-18 max-w-7xl mx-auto w-full">
-      <h1 className="text-center font-semibold text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight">
+    <div className="flex flex-col items-center px-6 sm:px-18 py-16 lg:py-18 max-w-7xl mx-auto w-full">
+      <h1 className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl max-w-2xl leading-tight">
         <p>
-          <span className="text-black mr-1">From</span>
-          <span className="text-green-600 mr-1">Prompts</span>
-          <span className="text-black mr-1">to</span>
+          <span className="text-black mr-2">From</span>
+          <span className="text-green-600 mr-2">Prompts</span>
+          <span className="text-black mr-2">to</span>
           <span className="text-green-600">Magic</span>
         </p>
       </h1>
-      <section className="flex max-md:flex-col md:gap-16 justify-start max-md:items-center w-full mt-10 z-0">
-        <div className="leftImg flex flex-col flex-1 w-full md:flex-4">
+      <section className="flex max-lg:flex-col lg:gap-16 justify-start max-lg:items-center w-full mt-10 z-0">
+        <div className="leftImg flex flex-col flex-1 w-full lg:flex-4">
           <div
-            className={`promptbox w-full flex flex-col justify-between max-md:min-h-38 border-2 border-green-500 rounded-2xl bg-gray-800 cursor-pointer z-10 transition-all duration-500 ${lineglow && "shadow-lg shadow-green-500/20"}`}
+            className={`promptbox w-full flex flex-col justify-between max-lg:min-h-38 border-2 border-green-500 rounded-2xl bg-gray-800 cursor-pointer z-10 transition-all duration-500 ${lineglow && "shadow-lg shadow-green-500/20"}`}
           >
             <AnimatePresence mode="wait">
               <motion.p
@@ -95,7 +95,7 @@ const Promptbox = () => {
               </div>
             </div>
           </div>
-          <div className="hidden relative md:flex flex-col justify-end items-center w-full mt-20">
+          <div className="hidden relative lg:flex flex-col justify-end items-center w-full mt-20">
             <img
               src={prompt1Img}
               alt="prompt1"
@@ -148,7 +148,7 @@ const Promptbox = () => {
             </div>
           </div>
         </div>
-        <div className="rightImg relative hidden md:flex md:flex-2 w-full rounded-lg justify-center items-start">
+        <div className="rightImg relative hidden lg:flex lg:flex-2 w-full rounded-lg justify-center items-start">
           <img
             src={prompt3Img}
             alt="prompt3"
@@ -177,7 +177,7 @@ const Promptbox = () => {
         </div>
 
         {/* MOBILE SECTION */}
-        <div className="relative w-0.5 flex z-2 h-30 md:hidden bg-green-500 shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]">
+        <div className="relative w-0.5 flex z-2 h-30 lg:hidden bg-green-500 shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]">
           <motion.div
             className="absolute h-full left-1/2 -translate-x-1/2"
             initial={{ y: 0 }}
@@ -192,17 +192,17 @@ const Promptbox = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="md:hidden w-full flex px-1.5 py-1.5 justify-center items-center z-20 border border-green-600 rounded-2xl bg-linear-to-br from-gray-300 via-gray-100 to-gray-200"
-        >
+          className="lg:hidden w-full aspect-square flex px-1.5 py-1.5 justify-center items-center z-20 border border-green-600 rounded-2xl bg-linear-to-br from-gray-300 via-gray-100 to-gray-200 min-h-[90vw]"
+>
           <img
             src={promptImages[mobPrompt - 1]}
             alt="promptImg"
-            className="w-full h-full rounded-2xl"
+            className="w-full h-full rounded-2xl transition-all"
           ></img>
         </motion.div>
 
         {/* ARROW BAR */}
-        <div className="md:hidden w-full h-auto flex justify-center items-center gap-3 mt-4">
+        <div className="lg:hidden w-full h-auto flex justify-center items-center gap-3 mt-4">
           {/* ⬅ Prev */}
           <button
             onClick={() => {
