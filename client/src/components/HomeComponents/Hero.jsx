@@ -3,11 +3,16 @@ import { TbArrowGuide } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa";
 import { TbBolt, TbShieldCheck } from "react-icons/tb";
 import { Link } from "react-router-dom";
+import { motion, scale } from "motion/react";
 
 const Hero = () => {
   return (
     <main className="grow flex flex-col justify-center items-center px-6 pt-44 sm:px-10 max-w-7xl mx-auto w-full">
-      <button
+      <motion.button
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        viewport={{ once: true }}
         className="flex items-center space-x-2 border border-green-600 text-green-600 text-xs rounded-full px-4 pr-1.5 py-1.5 mb-6 hover:bg-green-100 transition-all cursor-pointer"
         type="button"
       >
@@ -29,15 +34,33 @@ const Hero = () => {
             />
           </svg>
         </span>
-      </button>
-      <h1 className="text-center text-gray-900 font-semibold text-3xl sm:text-4xl md:text-5xl max-w-2xl leading-tight">
+      </motion.button>
+      <motion.h1
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="text-center text-gray-900 font-semibold text-3xl sm:text-4xl md:text-5xl max-w-2xl leading-tight"
+      >
         Generate stunning images from
         <span className="text-green-600 ml-2">simple text prompts</span>
-      </h1>
-      <p className="mt-4 text-center text-gray-600 max-w-md text-sm sm:text-base leading-relaxed">
-        Describe anything you imagine and let our AI instantly transform your words into beautiful, high-quality images.
-      </p>
-      <Link to='/generate'
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0.1, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.7 }}
+        viewport={{ once: true }}
+        className="mt-4 text-center text-gray-600 max-w-md text-sm sm:text-base leading-relaxed"
+      >
+        Describe anything you imagine and let our AI instantly transform your
+        words into beautiful, high-quality images.
+      </motion.p>
+      <motion.Link
+        to="/generate"
+        initial={{ opacity: 0.1, y: 50 , scale: 0}}
+        whileInView={{ opacity: 1, y: 0 , scale: 1}}
+        transition={{ delay: 0.3, duration: 0.7 }}
+        viewport={{ once: true }}
         className="mt-8 bg-linear-to-r from-[#05e056] to-[#04aa42] 
         text-white px-6 pr-2.5 py-2.5 rounded-full text-sm font-medium 
         flex items-center space-x-2 
@@ -62,9 +85,15 @@ const Hero = () => {
             strokeLinejoin="round"
           />
         </svg>
-      </Link>
+      </motion.Link>
 
-      <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-gray-600">
+      <motion.div
+        initial={{ opacity: 0.1, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.7 }}
+        viewport={{ once: true }}
+        className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-gray-600"
+      >
         <div className="flex items-center gap-2">
           <FaRegCreditCard className="text-green-600 text-base" />
           <span>Free Credits</span>
@@ -79,7 +108,7 @@ const Hero = () => {
           <TbShieldCheck className="text-green-600 text-base" />
           <span>Secure & Private</span>
         </div>
-      </div>
+      </motion.div>
 
       <div
         aria-label="Photos of leaders"
@@ -88,8 +117,12 @@ const Hero = () => {
   max-w-5xl w-full mx-auto pb-10"
       >
         {ImageUrl.map((img, index) => (
-          <div
+          <motion.div
             key={index}
+            initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
+            whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{delay:0.2,  duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
             className="group flex flex-col items-center text-center cursor-pointer"
           >
             <img
@@ -113,7 +146,7 @@ const Hero = () => {
             >
               {img.prompt}
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </main>

@@ -3,6 +3,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { IoIosArrowDown } from "react-icons/io";
 import faqAnime from "../../assets/json_anime/faqAnime.json";
 import { faqData } from "../../assets/faqs";
+import { Link } from "react-router-dom";
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -11,9 +12,34 @@ const Faq = () => {
     <div className="flex flex-col items-center px-6 sm:px-12 py-12 lg:py-16 max-w-7xl mx-auto w-full">
 
       {/* HEADING */}
-      <h1 className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl mb-12">
-        Frequently Asked <span className="text-green-600">Questions</span>
-      </h1>
+      <div className="flex flex-col items-center gap-3 mb-12">
+
+        {/* Eyebrow pill */}
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-green-200 bg-green-50">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-[11px] font-semibold tracking-[0.13em] uppercase text-green-600">
+            Support
+          </span>
+        </div>
+
+        {/* Title */}
+        <h1 className="text-center font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight">
+          Frequently Asked{" "}
+          <span className="text-green-600 relative inline-block">
+            Questions
+            <span className="absolute -bottom-1 left-0 w-full h-[3px] rounded-full bg-gradient-to-r from-green-400 to-green-600 opacity-50" />
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-sm text-gray-500 max-w-sm text-center leading-relaxed mt-1">
+          Everything you need to know. Can&apos;t find an answer?{" "}
+          <Link to="/contact" className="text-green-600 font-medium hover:underline underline-offset-2">
+            Chat with our team →
+          </Link>
+        </p>
+
+      </div>
 
       {/* MAIN LAYOUT */}
       <div className="flex flex-col lg:flex-row w-full gap-12 items-start">
@@ -29,7 +55,7 @@ const Faq = () => {
         </div>
 
         {/* RIGHT - FAQ LIST */}
-        <div className="flex flex-3 flex-col gap-5 w-full">
+        <div className="flex flex-3 flex-col gap-[14px] w-full">
 
           {faqData.map((faq, index) => {
             const isOpen = openIndex === index;
@@ -50,10 +76,10 @@ const Faq = () => {
               >
 
                 {/* subtle glow layer */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none bg-gradient-to-r from-green-100/20 via-transparent to-green-100/20"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none bg-gradient-to-r from-green-100/20 via-transparent to-green-100/20" />
 
                 {/* LEFT ACTIVE BAR */}
-                <div className={`absolute left-0 top-0 h-full w-[3px] bg-green-500 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`}></div>
+                <div className={`absolute left-0 top-0 h-full w-[3px] bg-green-500 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
 
                 {/* QUESTION */}
                 <button
@@ -61,7 +87,7 @@ const Faq = () => {
                   className="relative z-10 w-full flex justify-between items-center px-5 py-4 text-left cursor-pointer"
                 >
                   <span
-                    className={`font-medium text-[15px] tracking-tight transition-all duration-200
+                    className={` -medium text-[15px] tracking-tight transition-all duration-200
                     ${isOpen ? "text-green-600" : "text-gray-800 group-hover:text-green-600"}
                     `}
                   >

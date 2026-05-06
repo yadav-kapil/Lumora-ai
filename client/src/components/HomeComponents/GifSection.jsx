@@ -4,15 +4,19 @@ import { motion } from "motion/react";
 
 const GifSection = () => {
   return (
-    <section
-      className="flex flex-col items-center px-6 sm:px-18 py-12 md:py-14 max-w-7xl mx-auto w-full"
-    >
+    <section className="flex flex-col items-center px-6 sm:px-18 py-12 md:py-14 max-w-7xl mx-auto w-full">
       {/* HEADING */}
-      <h1 className="text-center text-black font-semibold text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight">
+      <motion.h1
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="text-center text-black font-semibold text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight"
+      >
         Transform Text into Masterpieces
         <br />
         with <span className="text-green-600">Lumora.ai</span>
-      </h1>
+      </motion.h1>
 
       {/* CONTENT */}
       <div className="relative w-full flex flex-col gap-4 items-center justify-center mt-8 md:mt-12 max-w-4xl">
