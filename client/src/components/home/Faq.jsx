@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { IoIosArrowDown } from "react-icons/io";
 import faqAnime from "../../assets/json_anime/faqAnime.json";
-import { faqData } from "../../assets/faqs";
+import { faqData } from "../../data/faqs";
 import { Link } from "react-router-dom";
 
 const Faq = () => {

@@ -1,12 +1,12 @@
-import Hero from "../components/HomeComponents/Hero";
+import Hero from "../components/home/Hero";
 import bgHero from "../assets/bgImages/bg_green1.jpeg";
 import bgGifSection from "../assets/bgImages/testgrid.png";
 import bgPromptbox from "../assets/bgImages/bg-with-grid.png";
-import GifSection from "../components/HomeComponents/GifSection";
-import Promptbox from "../components/HomeComponents/Promptbox";
-import PricePage from "../components/HomeComponents/PricePage";
-import Footer from "../components/HomeComponents/Footer";
-import Faq from "../components/HomeComponents/Faq";
+import GifSection from "../components/home/GifSection";
+import Promptbox from "../components/home/Promptbox";
+import PricePage from "../components/home/PricePage";
+import Footer from "../components/home/Footer";
+import Faq from "../components/home/Faq";
 
 const Home = () => {
   return (

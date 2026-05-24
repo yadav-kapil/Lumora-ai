@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { TfiControlPlay } from "react-icons/tfi";
-import { priceList } from "../../assets/pricingList";
+import { priceList } from "../../data/pricingList";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { FaCoins } from "react-icons/fa6";
 import { TiTick } from "react-icons/ti";

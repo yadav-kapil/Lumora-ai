@@ -1,4 +1,4 @@
-import { ImageUrl } from "../../assets/heroImages";
+import { ImageUrl } from "../../data/heroImages";
 import { TbArrowGuide } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa";
 import { TbBolt, TbShieldCheck } from "react-icons/tb";
