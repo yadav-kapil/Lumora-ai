@@ -43,16 +43,30 @@ const Promptbox = () => {
 
   return (
     <div className="flex flex-col items-center px-6 sm:px-18 py-16 lg:py-18 max-w-7xl mx-auto w-full">
-      <h1 className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl max-w-2xl leading-tight">
+      <motion.h1
+        initial={{ opacity: 0, filter: "blur(8px)" }}
+        whileInView={{ opacity: 1, filter: "blur(0px)" }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl max-w-2xl leading-tight"
+      >
         <p>
           <span className="text-black mr-2">From</span>
           <span className="text-green-600 mr-2">Prompts</span>
           <span className="text-black mr-2">to</span>
           <span className="text-green-600">Magic</span>
         </p>
-      </h1>
+      </motion.h1>
+
       <section className="flex max-lg:flex-col lg:gap-16 justify-start max-lg:items-center w-full mt-10 z-0">
-        <div className="leftImg flex flex-col flex-1 w-full lg:flex-4">
+        {/* LEFT COLUMN */}
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(12px)" }}
+          whileInView={{ opacity: 1, filter: "blur(0px)" }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="leftImg relative z-20 flex flex-col flex-1 w-full lg:flex-4"
+        >
           <div
             className={`promptbox w-full flex flex-col justify-between max-lg:min-h-38 border-2 border-green-500 rounded-2xl bg-gray-800 cursor-pointer z-10 transition-all duration-500 ${lineglow && "shadow-lg shadow-green-500/20"}`}
           >
@@ -61,18 +75,18 @@ const Promptbox = () => {
                 key={prompt}
                 initial={{
                   opacity: 0,
-                  y: 10,
+                  filter: "blur(4px)",
                 }}
                 animate={{
                   opacity: 1,
-                  y: 0,
+                  filter: "blur(0px)",
                 }}
                 exit={{
                   opacity: 0,
-                  y: 10,
+                  filter: "blur(4px)",
                 }}
                 transition={{
-                  duration: 0.1,
+                  duration: 0.15,
                 }}
                 className="text-white px-4 font-extralight py-1 mb-8 tracking-wide"
               >
@@ -120,10 +134,10 @@ const Promptbox = () => {
                 setPrompt(prompts[0]);
               }}
               alt="prompt1"
-              className="w-1/2 object-cover cursor-pointer rounded-3xl z-9 hover:z-20 transition-all hover:scale-[1.02] duration-700"
+              className="w-1/2 object-cover cursor-pointer rounded-3xl z-10 hover:z-20 transition-all hover:scale-[1.02] duration-700"
             />
             <div
-              className={`absolute -top-24 right-1/2 w-0.5 h-4/5 bg-green-500 transition-all duration-500 ${lineglow == 2 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
+              className={`absolute -top-24 right-1/2 w-0.5 h-4/5 bg-green-500 -z-10 transition-all duration-500 ${lineglow == 2 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
             >
               <motion.div
                 className="absolute left-1/2 top-0 -translate-x-1/2 h-full"
@@ -135,7 +149,7 @@ const Promptbox = () => {
               </motion.div>
             </div>
             <div
-              className={`absolute -top-24 right-1/5 w-0.5 h-3/5 bg-green-500 transition-all duration-500 ${lineglow == 1 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
+              className={`absolute -top-24 right-1/5 w-0.5 h-3/5 bg-green-500 -z-10 transition-all duration-500 ${lineglow == 1 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
             >
               <motion.div
                 className="absolute left-1/2 top-0 -translate-x-1/2 h-full"
@@ -147,8 +161,16 @@ const Promptbox = () => {
               </motion.div>
             </div>
           </div>
-        </div>
-        <div className="rightImg relative hidden lg:flex lg:flex-2 w-full rounded-lg justify-center items-start">
+        </motion.div>
+
+        {/* RIGHT COLUMN */}
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(12px)" }}
+          whileInView={{ opacity: 1, filter: "blur(0px)" }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="rightImg relative z-0 hidden lg:flex lg:flex-2 w-full rounded-lg justify-center items-start"
+        >
           <img
             src={prompt3Img}
             alt="prompt3"
@@ -160,10 +182,10 @@ const Promptbox = () => {
               setLineglow(0);
               setPrompt(prompts[0]);
             }}
-            className="w-full rounded-3xl cursor-pointer z-9 hover:z-20 hover:scale-[1.02] transition-all duration-700"
+            className="relative z-10 w-full rounded-3xl cursor-pointer hover:z-20 hover:scale-[1.02] transition-all duration-700"
           />
           <div
-            className={`absolute -left-1/3 top-1/12 w-1/2 h-0.5 bg-green-500 ${lineglow == 3 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
+            className={`absolute -left-1/3 top-1/12 w-1/2 h-0.5 bg-green-500 -z-10 ${lineglow == 3 && "shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]"}`}
           >
             <motion.div
               className="absolute left-0 top-1/2 -translate-y-1/2 w-full"
@@ -174,10 +196,10 @@ const Promptbox = () => {
               <IoIosArrowForward size={24} className="text-green-600" />
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* MOBILE SECTION */}
-        <div className="relative w-0.5 flex z-2 h-30 lg:hidden bg-green-500 shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]">
+        <div className="relative z-10 w-0.5 flex h-30 lg:hidden bg-green-500 shadow-[0_0_10px_#22c55e,0_0_20px_#22c55e]">
           <motion.div
             className="absolute h-full left-1/2 -translate-x-1/2"
             initial={{ y: 0 }}
@@ -193,7 +215,7 @@ const Promptbox = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="lg:hidden w-full aspect-square flex px-1.5 py-1.5 justify-center items-center z-20 border border-green-600 rounded-2xl bg-linear-to-br from-gray-300 via-gray-100 to-gray-200 min-h-[90vw]"
->
+        >
           <img
             src={promptImages[mobPrompt - 1]}
             alt="promptImg"
@@ -213,12 +235,12 @@ const Promptbox = () => {
               }
             }}
             className="h-full px-1.5 py-1.5 flex justify-center items-center 
-    rounded-full 
-    bg-[#1a1a1a] 
-    border border-white/10 
-    shadow-[0_2px_8px_rgba(0,0,0,0.6)] 
-    transition-all
-    active:bg-green-500"
+            rounded-full 
+            bg-[#1a1a1a] 
+            border border-white/10 
+            shadow-[0_2px_8px_rgba(0,0,0,0.6)] 
+            transition-all
+            active:bg-green-500"
           >
             <GrLinkPrevious size={22} className="text-white/80" />
           </button>
@@ -226,11 +248,11 @@ const Promptbox = () => {
           {/* ⚪ Indicators */}
           <div
             className="h-8 px-4 flex justify-center items-center 
-    rounded-full 
-    bg-[#121212] 
-    border border-white/10 
-    shadow-inner 
-    gap-1"
+            rounded-full 
+            bg-[#121212] 
+            border border-white/10 
+            shadow-inner 
+            gap-1"
           >
             <div className="flex gap-2 justify-center items-center">
               <span
@@ -239,7 +261,7 @@ const Promptbox = () => {
                     ? "w-8 bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.7)]"
                     : "w-2 bg-white/20"
                 } 
-          h-2 rounded-full transition-all duration-500`}
+                h-2 rounded-full transition-all duration-500`}
               ></span>
 
               <span
@@ -248,7 +270,7 @@ const Promptbox = () => {
                     ? "w-8 bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.7)]"
                     : "w-2 bg-white/20"
                 } 
-          h-2 rounded-full transition-all duration-500`}
+                h-2 rounded-full transition-all duration-500`}
               ></span>
 
               <span
@@ -257,7 +279,7 @@ const Promptbox = () => {
                     ? "w-8 bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.7)]"
                     : "w-2 bg-white/20"
                 } 
-          h-2 rounded-full transition-all duration-500`}
+                h-2 rounded-full transition-all duration-500`}
               ></span>
             </div>
           </div>
@@ -273,12 +295,12 @@ const Promptbox = () => {
               setPrompt(prompts[mobPrompt]);
             }}
             className="h-full px-1.5 py-1.5 flex justify-center items-center 
-    rounded-full 
-    bg-[#1a1a1a] 
-    border border-white/10 
-    shadow-[0_2px_8px_rgba(0,0,0,0.6)] 
-    active:bg-green-500
-    transition-all"
+            rounded-full 
+            bg-[#1a1a1a] 
+            border border-white/10 
+            shadow-[0_2px_8px_rgba(0,0,0,0.6)] 
+            active:bg-green-500
+            transition-all"
           >
             <GrLinkNext size={22} className="text-white/80" />
           </button>

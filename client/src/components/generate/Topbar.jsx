@@ -8,12 +8,36 @@ import {
   RiCoinLine,
   RiNotification2Fill,
 } from "react-icons/ri";
+import { useAuthContext } from "../../context/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function TopBar() {
   const [credits] = useState(100);
   const [avatarLetter] = useState("K");
   const [showMenu, setShowMenu] = useState(false);
 
+  const { dispatch } = useAuthContext();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URI}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Logout failed");
+      }
+
+      navigate("/", { replace: true, flushSync: true });
+      dispatch({
+        type: "LOGOUT",
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <header className="fixed top-0 z-50 w-full h-[62px] border-b border-slate-100 bg-white/90 backdrop-blur-xl px-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
       <div className="flex h-full items-center justify-between max-w-screen-2xl mx-auto">
@@ -131,7 +155,10 @@ export default function TopBar() {
                     </button>
                   ))}
                   <div className="my-1 h-px bg-slate-100" />
-                  <button className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-red-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-500">
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-red-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-500"
+                  >
                     <RiLogoutBoxRLine size={15} />
                     <span>Logout</span>
                   </button>

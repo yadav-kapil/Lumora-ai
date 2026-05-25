@@ -4,6 +4,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import faqAnime from "../../assets/json_anime/faqAnime.json";
 import { faqData } from "../../data/faqs";
 import { NavLink } from "react-router-dom";
+import { motion } from "motion/react";
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -11,7 +12,13 @@ const Faq = () => {
   return (
     <div className="flex flex-col items-center px-6 sm:px-12 py-12 lg:py-16 max-w-7xl mx-auto w-full">
       {/* HEADING */}
-      <div className="flex flex-col items-center gap-3 mb-12">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col items-center gap-3 mb-12"
+      >
         {/* Eyebrow pill */}
         <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-green-200 bg-green-50">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -39,19 +46,25 @@ const Faq = () => {
             Chat with our team →
           </NavLink>
         </p>
-      </div>
+      </motion.div>
 
       {/* MAIN LAYOUT */}
       <div className="flex flex-col lg:flex-row w-full gap-12 items-start">
         {/* LEFT - LOTTIE */}
-        <div className="lg:flex flex-2 justify-center items-center w-full hidden">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="lg:flex flex-2 justify-center items-center w-full hidden"
+        >
           <DotLottieReact
             data={faqAnime}
             loop
             autoplay
             className="w-full scale-125 -translate-x-12 translate-y-8"
           />
-        </div>
+        </motion.div>
 
         {/* RIGHT - FAQ LIST */}
         <div className="flex flex-3 flex-col gap-[14px] w-full">
@@ -59,8 +72,12 @@ const Faq = () => {
             const isOpen = openIndex === index;
 
             return (
-              <div
+              <motion.div
                 key={faq.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
                 className={`group relative rounded-2xl overflow-hidden transition-all duration-300
                 border border-white/40
                 bg-white/70 backdrop-blur-xl
@@ -113,7 +130,7 @@ const Faq = () => {
                     {faq.answer}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

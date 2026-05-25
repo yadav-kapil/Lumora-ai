@@ -5,7 +5,7 @@ import { Sparkles, ShieldCheck, Palette, Mail, Lock, Eye } from "lucide-react";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import useLogin from "../hooks/useLogin";
+import useLogin from "../../hooks/useLogin";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const Login = () => {
       return;
     }
     console.log(result.data);
-    navigate("/generate");
+    navigate("/app/generate");
   };
 
   return (

@@ -58,7 +58,7 @@ const Hero = () => {
         words into beautiful, high-quality images.
       </motion.p>
       <MotionNavLink
-        to="/generate"
+        to="/app/generate"
         initial={{ opacity: 0.1, y: 50, scale: 0 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.7 }}

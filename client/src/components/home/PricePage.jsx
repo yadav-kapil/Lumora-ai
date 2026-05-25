@@ -4,35 +4,55 @@ import { priceList } from "../../data/pricingList";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { FaCoins } from "react-icons/fa6";
 import { TiTick } from "react-icons/ti";
-import { ImCross } from "react-icons/im";
 import { useState } from "react";
 import cross from "../../assets/svg/cross.svg";
+import { motion } from "motion/react";
 
 const PricePage = () => {
   const [activeBox, setActiveBox] = useState(1);
   return (
     <div className="flex flex-col items-center px-6 sm:px-18 mt-12 max-w-7xl mx-auto w-full">
       <div className="w-5/6 h-0.75 bg-linear-to-r from-white via-[#05e056] via-[#04aa42] via-[#05e056] to-white"></div>
-      <h1 className="text-center text-black font-semibold my-6 text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight">
-        Pick a <span className="text-green-600">Flexible Plan</span>
-      </h1>
-      <NavLink
-        to="/pricing"
-        className="bg-linear-to-r from-[#05e056] to-[#04aa42] 
-        text-white px-3 py-2.5 pl-4 mb-10 rounded-full text-sm font-medium 
-        flex justify-center items-center space-x-2 
-        hover:scale-105 
-        shadow-md shadow-green-500/20 hover:shadow-green-500/40
-        transition-all duration-500 ease-out cursor-pointer"
+      
+      <motion.h1 
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="text-center text-black font-semibold my-6 text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight"
       >
-        <span>Subscribe Now</span>
-        <TfiControlPlay className="text-white" />
-      </NavLink>
+        Pick a <span className="text-green-600">Flexible Plan</span>
+      </motion.h1>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <NavLink
+          to="/pricing"
+          className="bg-linear-to-r from-[#05e056] to-[#04aa42] 
+          text-white px-3 py-2.5 pl-4 mb-10 rounded-full text-sm font-medium 
+          flex justify-center items-center space-x-2 
+          hover:scale-105 
+          shadow-md shadow-green-500/20 hover:shadow-green-500/40
+          transition-all duration-500 ease-out cursor-pointer"
+        >
+          <span>Subscribe Now</span>
+          <TfiControlPlay className="text-white" />
+        </NavLink>
+      </motion.div>
+
       <div className="w-full grid grid-cols-1 lg:grid-cols-3 mx-auto gap-6 mb-16">
         {priceList.map((list, index) => {
           return (
-            <div
+            <motion.div
               key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
               onMouseEnter={() => setActiveBox(index)}
               onMouseLeave={() => setActiveBox(1)}
               className={`py-6 px-4 rounded-4xl bg-[#3e3d3d] flex flex-col gap-4 w-full md:w-3/4 md:mx-auto lg:w-full transition-transform duration-500 cursor-pointer border-2 border-green-500 ${index == activeBox && "lg:scale-[1.07] shadow-[0_0_12px_rgba(34,197,94,0.25),0_0_24px_rgba(34,197,94,0.2)]"}`}
@@ -108,7 +128,7 @@ const PricePage = () => {
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

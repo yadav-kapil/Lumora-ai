@@ -1,9 +1,34 @@
 import { useState } from "react";
 import { BiImageAlt } from "react-icons/bi";
-import { NavLink } from "react-router-dom";
+import { RiLogoutBoxRLine } from "react-icons/ri";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/auth/AuthContext";
 
-const Navbar = ({showBanner}) => {
+const Navbar = ({ showBanner }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated, dispatch } = useAuthContext();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URI}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Logout failed");
+      }
+
+      navigate("/", { replace: true, flushSync: true });
+      dispatch({
+        type: "LOGOUT",
+      });
+      setSidebarOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <header
@@ -42,7 +67,7 @@ const Navbar = ({showBanner}) => {
           </NavLink>
 
           <NavLink
-            to="/generate"
+            to="/app/generate"
             onClick={() => setSidebarOpen(false)}
             className="hover:text-green-600 relative overflow-hidden group h-6"
           >
@@ -80,6 +105,16 @@ const Navbar = ({showBanner}) => {
             </span>
           </NavLink>
 
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="md:hidden flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-all duration-300"
+            >
+              <RiLogoutBoxRLine className="text-base" />
+              Logout
+            </button>
+          )}
+
           {isSidebarOpen && (
             <button
               id="closeMenu"
@@ -102,30 +137,42 @@ const Navbar = ({showBanner}) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <NavLink
-            to="/auth/login"
-            className="max-md:hidden flex px-3 py-1 hover:bg-gray-200 transition border border-slate-300 rounded-full"
-          >
-            Get Started
-          </NavLink>
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-all duration-300"
+            >
+              <RiLogoutBoxRLine className="text-base" />
+              Logout
+            </button>
+          ) : (
+            <>
+              <NavLink
+                to="/auth/login"
+                className="max-md:hidden flex px-3 py-1 hover:bg-gray-200 transition border border-slate-300 rounded-full"
+              >
+                Get Started
+              </NavLink>
 
-          <NavLink
-            to="/auth/signup"
-            className="hidden sm:flex 
-            px-3 py-1.5 rounded-full text-sm font-medium text-white
-            
-            bg-linear-to-r from-[#22c55e] to-[#16a34a]
-            border border-slate-300
-            
-            shadow-sm shadow-black/5
-            hover:shadow-md hover:shadow-black/10
-            
-            hover:from-[#16a34a] hover:to-[#15803d]
-            
-            transition-all duration-300"
-          >
-            Sign up
-          </NavLink>
+              <NavLink
+                to="/auth/signup"
+                className="hidden sm:flex 
+                px-3 py-1.5 rounded-full text-sm font-medium text-white
+                
+                bg-linear-to-r from-[#22c55e] to-[#16a34a]
+                border border-slate-300
+                
+                shadow-sm shadow-black/5
+                hover:shadow-md hover:shadow-black/10
+                
+                hover:from-[#16a34a] hover:to-[#15803d]
+                
+                transition-all duration-300"
+              >
+                Sign up
+              </NavLink>
+            </>
+          )}
 
           <button
             id="openMenu"

@@ -1,11 +1,32 @@
 import { BiImageAlt } from "react-icons/bi";
 import { FaXTwitter, FaLinkedin, FaGithub } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
+import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const exploreLinks = [
+    { name: "Create Image", path: "/app/generate" },
+    { name: "Contact", path: "/contact" },
+    { name: "Pricing", path: "/pricing" }
+  ];
+
+  const legalLinks = [
+    { name: "Privacy Policy", path: "/legal/privacy" },
+    { name: "Terms & Conditions", path: "/legal/terms" },
+    { name: "Refund Policy", path: "/legal/refund" },
+    { name: "Disclaimer", path: "/legal/disclaimer" }
+  ];
+
   return (
     <footer className="w-full border-t border-gray-300 pt-6 md:pt-10">
-      <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-10"
+      >
         {/* LEFT */}
         <div className="w-full md:w-[25%] space-y-4">
           <div className="flex items-center gap-2">
@@ -42,41 +63,33 @@ const Footer = () => {
             <div className="w-1/2 sm:w-auto">
               <h2 className="font-semibold mb-3">Explore</h2>
               <ul className="space-y-2 text-sm">
-                {["Create Image", "Gallery", "Pricing", "API", "Docs"].map(
-                  (item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
-                        className="text-gray-500 relative inline-block group transition hover:text-gray-800"
-                      >
-                        {item}
-                        <span className="absolute left-1/2 -bottom-0.5 w-0 h-px bg-green-500 transition-all duration-300 group-hover:w-full group-hover:left-0 "></span>
-                      </a>
-                    </li>
-                  ),
-                )}
+                {exploreLinks.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.path}
+                      className="text-gray-500 relative inline-block group transition hover:text-gray-800"
+                    >
+                      {link.name}
+                      <span className="absolute left-1/2 -bottom-0.5 w-0 h-px bg-green-500 transition-all duration-300 group-hover:w-full group-hover:left-0 "></span>
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* HELP */}
             <div className="w-1/2 sm:w-auto">
-              <h2 className="font-semibold mb-3">Support</h2>
+              <h2 className="font-semibold mb-3">Legal</h2>
               <ul className="space-y-2 text-sm">
-                {[
-                  "Prompt Guide",
-                  "How it Works",
-                  "Billing",
-                  "Report Issue",
-                  "FAQs",
-                ].map((item) => (
-                  <li key={item}>
-                    <a
-                      href="#"
+                {legalLinks.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.path}
                       className="text-gray-500 relative inline-block group transition hover:text-gray-800"
                     >
-                      {item}
+                      {link.name}
                       <span className="absolute left-1/2 -bottom-0.5 w-0 h-px bg-green-500 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -102,23 +115,29 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* BOTTOM LINE */}
       <div className="max-w-7xl mx-auto h-px bg-gray-300"></div>
 
-      <div className="text-center text-gray-500 text-xs py-4 flex justify-between max-w-7xl mx-auto">
+      <div className="text-center text-gray-500 text-xs py-4 flex justify-between max-w-7xl mx-auto px-6">
               <span>© 2025 All rights reserved.</span>
               <span>SYSTUMM</span>
       </div>
 
       {/* BIG BACKGROUND TEXT */}
-      <div className="w-full overflow-hidden flex justify-center items-end px-4 sm:px-8 md:px-12 lg:px-16 mt-4 md:mt-0 translate-y-2 md:translate-y-4 lg:translate-y-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="w-full overflow-hidden flex justify-center items-end px-4 sm:px-8 md:px-12 lg:px-16 mt-4 md:mt-0 translate-y-2 md:translate-y-4 lg:translate-y-8"
+      >
         <h1 className="text-[clamp(48px,12vw,180px)] font-semibold text-center leading-none tracking-tight select-none whitespace-nowrap">
           <span className="text-gray-400/60">LUMORA.</span>
           <span className="text-green-500/50">ai</span>
         </h1>
-      </div>
+      </motion.div>
     </footer>
   );
 };

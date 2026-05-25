@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useAuthContext } from "../context/auth/AuthContext";
 
 const useSignup = () => {
   const [isLoading, setIsLoading] = useState(false);
-
   const [error, setError] = useState("");
+
+  const { dispatch } = useAuthContext();
 
   const signup = async (formData) => {
     try {
@@ -32,6 +34,14 @@ const useSignup = () => {
           message: data.message,
         };
       }
+
+      dispatch({
+        type: "LOGIN",
+        payload: {
+          user: data.user,
+          accessToken: data.accessToken,
+        },
+      });
 
       return {
         success: true,

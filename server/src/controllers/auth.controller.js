@@ -49,6 +49,11 @@ export const registerUser = wrapAsync(async (req, res) => {
       success: true,
       message: "User Added Successfully",
       accessToken,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
     });
 });
 
@@ -105,6 +110,11 @@ export const loginUser = wrapAsync(async (req, res) => {
       success: true,
       message: "Logged In Successfully",
       accessToken,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
     });
 });
 

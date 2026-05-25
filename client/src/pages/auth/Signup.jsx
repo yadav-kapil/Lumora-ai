@@ -14,7 +14,7 @@ import {
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import useSignup from "../hooks/useSignup";
+import useSignup from "../../hooks/useSignup";
 
 const Signup = () => {
   const { signup, error, isLoading } = useSignup();
@@ -39,7 +39,7 @@ const Signup = () => {
       return;
     }
     console.log(result.data);
-    navigate("/generate");
+    navigate("/app/generate");
   };
 
   return (

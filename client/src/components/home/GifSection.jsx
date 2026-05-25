@@ -19,7 +19,13 @@ const GifSection = () => {
       </motion.h1>
 
       {/* CONTENT */}
-      <div className="relative w-full flex flex-col gap-4 items-center justify-center mt-8 md:mt-12 max-w-4xl">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98, y: 20 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, delay: 0.1 }}
+        className="relative w-full flex flex-col gap-4 items-center justify-center mt-8 md:mt-12 max-w-4xl"
+      >
         {/* IMAGE CARD */}
         <div className="max-w-4xl md:pr-8 rounded-2xl">
           <motion.img
@@ -60,7 +66,7 @@ const GifSection = () => {
             <span className="text-green-600">Creativity</span>
           </p>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
