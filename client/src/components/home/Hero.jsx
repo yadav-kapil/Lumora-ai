@@ -2,8 +2,10 @@ import { ImageUrl } from "../../data/heroImages";
 import { TbArrowGuide } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa";
 import { TbBolt, TbShieldCheck } from "react-icons/tb";
-import { Link } from "react-router-dom";
-import { motion, scale } from "motion/react";
+import { NavLink } from "react-router-dom";
+import { motion } from "motion/react";
+
+const MotionNavLink = motion.create(NavLink);
 
 const Hero = () => {
   return (
@@ -55,10 +57,10 @@ const Hero = () => {
         Describe anything you imagine and let our AI instantly transform your
         words into beautiful, high-quality images.
       </motion.p>
-      <motion.Link
+      <MotionNavLink
         to="/generate"
-        initial={{ opacity: 0.1, y: 50 , scale: 0}}
-        whileInView={{ opacity: 1, y: 0 , scale: 1}}
+        initial={{ opacity: 0.1, y: 50, scale: 0 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.7 }}
         viewport={{ once: true }}
         className="mt-8 bg-linear-to-r from-[#05e056] to-[#04aa42] 
@@ -85,7 +87,7 @@ const Hero = () => {
             strokeLinejoin="round"
           />
         </svg>
-      </motion.Link>
+      </MotionNavLink>
 
       <motion.div
         initial={{ opacity: 0.1, y: 40 }}
@@ -121,7 +123,7 @@ const Hero = () => {
             key={index}
             initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
             whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-            transition={{delay:0.2,  duration: 0.8, ease: "easeOut" }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
             className="group flex flex-col items-center text-center cursor-pointer"
           >

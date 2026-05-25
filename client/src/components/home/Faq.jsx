@@ -3,17 +3,15 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { IoIosArrowDown } from "react-icons/io";
 import faqAnime from "../../assets/json_anime/faqAnime.json";
 import { faqData } from "../../data/faqs";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
     <div className="flex flex-col items-center px-6 sm:px-12 py-12 lg:py-16 max-w-7xl mx-auto w-full">
-
       {/* HEADING */}
       <div className="flex flex-col items-center gap-3 mb-12">
-
         {/* Eyebrow pill */}
         <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-green-200 bg-green-50">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -34,16 +32,17 @@ const Faq = () => {
         {/* Subtitle */}
         <p className="text-sm text-gray-500 max-w-sm text-center leading-relaxed mt-1">
           Everything you need to know. Can&apos;t find an answer?{" "}
-          <Link to="/contact" className="text-green-600 font-medium hover:underline underline-offset-2">
+          <NavLink
+            to="/contact"
+            className="text-green-600 font-medium hover:underline underline-offset-2"
+          >
             Chat with our team →
-          </Link>
+          </NavLink>
         </p>
-
       </div>
 
       {/* MAIN LAYOUT */}
       <div className="flex flex-col lg:flex-row w-full gap-12 items-start">
-
         {/* LEFT - LOTTIE */}
         <div className="lg:flex flex-2 justify-center items-center w-full hidden">
           <DotLottieReact
@@ -56,7 +55,6 @@ const Faq = () => {
 
         {/* RIGHT - FAQ LIST */}
         <div className="flex flex-3 flex-col gap-[14px] w-full">
-
           {faqData.map((faq, index) => {
             const isOpen = openIndex === index;
 
@@ -74,12 +72,13 @@ const Faq = () => {
                 ${isOpen && "border-green-300 shadow-[0_8px_30px_rgba(34,197,94,0.18)]"}
                 `}
               >
-
                 {/* subtle glow layer */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none bg-gradient-to-r from-green-100/20 via-transparent to-green-100/20" />
 
                 {/* LEFT ACTIVE BAR */}
-                <div className={`absolute left-0 top-0 h-full w-[3px] bg-green-500 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
+                <div
+                  className={`absolute left-0 top-0 h-full w-[3px] bg-green-500 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`}
+                />
 
                 {/* QUESTION */}
                 <button
@@ -114,11 +113,9 @@ const Faq = () => {
                     {faq.answer}
                   </p>
                 </div>
-
               </div>
             );
           })}
-
         </div>
       </div>
     </div>

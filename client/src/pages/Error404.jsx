@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Banner from "../components/Banner";
 
@@ -28,7 +28,7 @@ export default function Error404() {
           </p>
 
           <div className="flex items-center justify-center gap-4 mt-8">
-            <Link
+            <NavLink
               to="/"
               className="bg-green-500 hover:bg-green-600 
         px-3 py-2.5 text-white rounded-lg 
@@ -36,9 +36,9 @@ export default function Error404() {
         active:scale-95 transition-all duration-200"
             >
               Go back home
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/contact"
               className="group flex items-center gap-2 px-4 py-2.5 
         rounded-lg 
@@ -66,7 +66,7 @@ export default function Error404() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </NavLink>
           </div>
         </div>
       </div>

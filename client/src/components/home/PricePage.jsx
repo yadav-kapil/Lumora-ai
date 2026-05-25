@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { TfiControlPlay } from "react-icons/tfi";
 import { priceList } from "../../data/pricingList";
 import { BsLightningChargeFill } from "react-icons/bs";
@@ -16,7 +16,7 @@ const PricePage = () => {
       <h1 className="text-center text-black font-semibold my-6 text-2xl sm:text-3xl md:text-4xl max-w-2xl leading-tight">
         Pick a <span className="text-green-600">Flexible Plan</span>
       </h1>
-      <Link
+      <NavLink
         to="/pricing"
         className="bg-linear-to-r from-[#05e056] to-[#04aa42] 
         text-white px-3 py-2.5 pl-4 mb-10 rounded-full text-sm font-medium 
@@ -27,7 +27,7 @@ const PricePage = () => {
       >
         <span>Subscribe Now</span>
         <TfiControlPlay className="text-white" />
-      </Link>
+      </NavLink>
       <div className="w-full grid grid-cols-1 lg:grid-cols-3 mx-auto gap-6 mb-16">
         {priceList.map((list, index) => {
           return (
@@ -77,10 +77,7 @@ const PricePage = () => {
               <div className="flex flex-col gap-3 w-11/12 mx-auto px-5 py-4 rounded-2xl bg-[#5b5b5b]/80 backdrop-blur-sm">
                 {list.features.map((feature, i) => {
                   return (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3"
-                    >
+                    <div key={i} className="flex items-start gap-3">
                       {/* ICON */}
                       <div
                         className=" flex items-center justify-center w-5 h-5 rounded-full 
