@@ -1,5 +1,6 @@
 import express from "express";
 import protect from '../middlewares/auth.middleware.js';
+import protectCsrf from "../middlewares/csrf.middleware.js";
 import {
   registerUser,
   loginUser,
@@ -14,10 +15,10 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/logout", logoutUser);
+router.post("/logout", protectCsrf, logoutUser);
 
 router.get("/me", protect, getMe);
 
-router.post("/refresh-token", refreshAccessToken);
+router.post("/refresh-token", protectCsrf, refreshAccessToken);
 
 export default router;

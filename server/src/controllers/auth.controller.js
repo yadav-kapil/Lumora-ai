@@ -11,6 +11,20 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
+const isProduction = config.NODE_ENV === "production";
+
+const refreshTokenCookieBaseOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  path: "/",
+};
+
+const refreshTokenCookieOptions = {
+  ...refreshTokenCookieBaseOptions,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 // register
 export const registerUser = wrapAsync(async (req, res) => {
   const { username, email, password } = req.body;
@@ -41,10 +55,7 @@ export const registerUser = wrapAsync(async (req, res) => {
 
   return res
     .status(201)
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
     .json({
       success: true,
       message: "User Added Successfully",
@@ -102,10 +113,7 @@ export const loginUser = wrapAsync(async (req, res) => {
   // send response
   return res
     .status(200)
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
     .json({
       success: true,
       message: "Logged In Successfully",
@@ -133,17 +141,23 @@ export const logoutUser = wrapAsync(async (req, res) => {
   try {
     decoded = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
   } catch (err) {
-    return res.clearCookie("refreshToken").status(200).json({
-      success: true,
-      message: "Logged Out Successfully",
-    });
+    return res
+      .clearCookie("refreshToken", refreshTokenCookieBaseOptions)
+      .status(200)
+      .json({
+        success: true,
+        message: "Logged Out Successfully",
+      });
   }
 
   if (!decoded.sessionId) {
-    return res.clearCookie("refreshToken").status(200).json({
-      success: true,
-      message: "Logged Out Successfully",
-    });
+    return res
+      .clearCookie("refreshToken", refreshTokenCookieBaseOptions)
+      .status(200)
+      .json({
+        success: true,
+        message: "Logged Out Successfully",
+      });
   }
 
   const session = await Session.findOne({
@@ -160,10 +174,13 @@ export const logoutUser = wrapAsync(async (req, res) => {
     }
   }
 
-  return res.clearCookie("refreshToken").status(200).json({
-    success: true,
-    message: "Logged Out Successfully",
-  });
+  return res
+    .clearCookie("refreshToken", refreshTokenCookieBaseOptions)
+    .status(200)
+    .json({
+      success: true,
+      message: "Logged Out Successfully",
+    });
 });
 
 // get-me
@@ -224,10 +241,7 @@ export const refreshAccessToken = wrapAsync(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    .cookie("refreshToken", newRefreshToken, refreshTokenCookieOptions)
     .json({
       success: true,
       message: "Access Token Refreshed Successfully",

@@ -148,7 +148,7 @@ const Contact = () => {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="lg:col-span-5 space-y-6"
+            className="lg:col-span-5 space-y-6 order-2 lg:order-1"
           >
             {/* GENERAL SUPPORT */}
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group">
@@ -243,7 +243,7 @@ const Contact = () => {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="lg:col-span-7"
+            className="lg:col-span-7 order-1 lg:order-2"
           >
             <div className="bg-white/85 backdrop-blur-2xl border border-white/80 rounded-[28px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-6 sm:p-8 md:p-10 relative overflow-hidden">
               <AnimatePresence mode="wait">

@@ -357,8 +357,11 @@ const Signup = () => {
                 )}
 
                 {/* BUTTON */}
-                <button className="w-full h-10 rounded-xl bg-green-500 hover:bg-green-600 transition-all text-white text-[13px] font-bold shadow-[0_10px_30px_rgba(34,197,94,0.30)]">
-                  Create Account →
+                <button
+                  disabled={isLoading}
+                  className="w-full h-10 rounded-xl bg-green-500 hover:bg-green-600 transition-all text-white text-[13px] font-bold shadow-[0_10px_30px_rgba(34,197,94,0.30)] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isLoading ? "Signing..." : "Create Account →"}
                 </button>
               </form>
 

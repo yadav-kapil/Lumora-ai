@@ -10,7 +10,7 @@ import useLogin from "../../hooks/useLogin";
 const Login = () => {
   const navigate = useNavigate();
 
-  const { login, error } = useLogin();
+  const { login, error, isLoading } = useLogin();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -311,8 +311,11 @@ const Login = () => {
                 )}
 
                 {/* BUTTON */}
-                <button className="w-full h-10 rounded-xl bg-green-500 hover:bg-green-600 transition-all text-white text-[13px] font-bold shadow-[0_10px_30px_rgba(34,197,94,0.30)]">
-                  Sign In →
+                <button
+                  disabled={isLoading}
+                  className="w-full h-10 rounded-xl bg-green-500 hover:bg-green-600 transition-all text-white text-[13px] font-bold shadow-[0_10px_30px_rgba(34,197,94,0.30)] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isLoading ? "Logging..." : "Sign In →"}
                 </button>
               </form>
 

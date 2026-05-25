@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { authReducer, initialState } from "./authReducer";
-import { verifyUser } from "./authAction";
+import { verifyUser } from "../../services/authService";
 import LoadingScreen from "../../components/LoadingScreen";
 
 const AuthContext = createContext(null);
