@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthContext } from "../context/auth/AuthContext";
+import { SERVER_URI } from "../config/api";
 
 const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +15,7 @@ const useLogin = () => {
       setError("");
 
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URI}/api/auth/login`,
+        `${SERVER_URI}/api/auth/login`,
         {
           method: "POST",
           credentials: "include",

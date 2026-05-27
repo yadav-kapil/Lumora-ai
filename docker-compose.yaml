@@ -6,8 +6,8 @@ services:
       context: ./server
       dockerfile: Dockerfile
     container_name: backend
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     env_file: ./server/.env
 
   # Client service
@@ -15,8 +15,6 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
-        - VITE_SERVER_URI=http://localhost:5000
 
     container_name: frontend
     ports:

@@ -13,10 +13,6 @@ RUN npm install
 # Copy other files to my current directory
 COPY . .
 
-# Expose VITE_SERVER_URI build arg for Vite compile
-ARG VITE_SERVER_URI
-ENV VITE_SERVER_URI=$VITE_SERVER_URI
-
 # Build and optimize static file
 RUN npm run build
 

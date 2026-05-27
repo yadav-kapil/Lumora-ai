@@ -1,8 +1,10 @@
+import { SERVER_URI } from "../config/api";
+
 export const verifyUser = async (dispatch) => {
   try {
     // REFRESH TOKEN
     const refreshRes = await fetch(
-      `${import.meta.env.VITE_SERVER_URI}/api/auth/refresh-token`,
+      `${SERVER_URI}/api/auth/refresh-token`,
       {
         method: "POST",
         credentials: "include",
@@ -21,7 +23,7 @@ export const verifyUser = async (dispatch) => {
 
     // GET USER
     const userRes = await fetch(
-      `${import.meta.env.VITE_SERVER_URI}/api/auth/me`,
+      `${SERVER_URI}/api/auth/me`,
       {
         credentials: "include",
         headers: {
