@@ -2,12 +2,16 @@ import ExpressError from "../utils/ExpressError.js";
 import config from "../config/config.js";
 
 const getOriginFromRequest = (req) => {
+  // Check Origin header first
   const originHeader = req.get("origin");
+
   if (originHeader) {
     return originHeader;
   }
 
+  // Fallback to Referer header
   const refererHeader = req.get("referer");
+
   if (!refererHeader) {
     return null;
   }

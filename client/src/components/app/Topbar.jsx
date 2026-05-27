@@ -10,7 +10,6 @@ import {
 } from "react-icons/ri";
 import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { SERVER_URI } from "../../config/api";
 
 export default function TopBar({ onProfileClick, onSettingsClick }) {
   const [credits] = useState(100);
@@ -22,7 +21,7 @@ export default function TopBar({ onProfileClick, onSettingsClick }) {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch(`${SERVER_URI}/api/auth/logout`, {
+      const res = await fetch(`/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

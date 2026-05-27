@@ -3,7 +3,6 @@ import { BiImageAlt } from "react-icons/bi";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/auth/AuthContext";
-import { SERVER_URI } from "../config/api";
 
 const Navbar = ({ showBanner }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -12,7 +11,7 @@ const Navbar = ({ showBanner }) => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch(`${SERVER_URI}/api/auth/logout`, {
+      const res = await fetch(`/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
