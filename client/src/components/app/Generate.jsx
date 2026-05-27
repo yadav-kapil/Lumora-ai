@@ -17,6 +17,7 @@ import {
   IMAGE_COUNTS,
   HISTORY,
 } from "../../data/generateData";
+import History from "./History";
 
 const PREVIEW_IMG = "";
 
@@ -113,6 +114,7 @@ export default function Generate() {
   const [model, setModel] = useState("basic");
   const [res, setRes] = useState("normal");
   const [count, setCount] = useState(1);
+  const [showHistory, setShowHistory] = useState(false);
 
   const ratio = SIZES.find((s) => s.id === size) || SIZES[0];
 
@@ -423,7 +425,10 @@ export default function Generate() {
               </p>
             </div>
 
-            <button className="text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-700">
+            <button
+              onClick={() => setShowHistory(true)}
+              className="text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-700"
+            >
               View All
             </button>
           </div>
@@ -466,6 +471,8 @@ export default function Generate() {
           )}
         </div>
       </div>
+
+      {showHistory && <History onClose={() => setShowHistory(false)} />}
 
       <style>{`
         @keyframes shimmer {

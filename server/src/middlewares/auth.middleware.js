@@ -4,7 +4,7 @@ import ExpressError from "../utils/ExpressError.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import jwt from "jsonwebtoken";
 
-const protect = wrapAsync(async (req, res, next) => {
+const authenticate = wrapAsync(async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // check header
@@ -40,4 +40,4 @@ const protect = wrapAsync(async (req, res, next) => {
   next();
 });
 
-export default protect;
+export default authenticate;

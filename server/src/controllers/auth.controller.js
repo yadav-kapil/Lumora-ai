@@ -235,8 +235,28 @@ export const refreshAccessToken = wrapAsync(async (req, res) => {
     matchedSession._id.toString(),
   );
   const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
-  matchedSession.refreshToken = hashedRefreshToken;
-  await matchedSession.save();
+
+  const updatedSession = await Session.findOneAndUpdate(
+    {
+      _id: matchedSession._id,
+      userId: decoded.id,
+      revoked: false,
+      refreshToken: matchedSession.refreshToken,
+    },
+    {
+      $set: {
+        refreshToken: hashedRefreshToken,
+      },
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!updatedSession) {
+    throw new ExpressError(409, "Refresh token already rotated");
+  }
+
   const accessToken = generateAccessToken(decoded.id);
 
   return res

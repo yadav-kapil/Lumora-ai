@@ -32,7 +32,7 @@ const Login = () => {
       return;
     }
     console.log(result.data);
-    navigate("/app/generate");
+    navigate("/app/generate", {replace: true});
   };
 
   return (

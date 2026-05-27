@@ -1,6 +1,7 @@
 import express from "express";
-import protect from '../middlewares/auth.middleware.js';
+import authenticate from '../middlewares/auth.middleware.js';
 import protectCsrf from "../middlewares/csrf.middleware.js";
+import { strictLimiter } from "../middlewares/rateLimiter.middleware.js";
 import {
   registerUser,
   loginUser,
@@ -11,14 +12,14 @@ import {
 
 const router = express.Router();
 
-router.post("/register", registerUser);
+router.post("/register", strictLimiter, registerUser);
 
-router.post("/login", loginUser);
+router.post("/login", strictLimiter, loginUser);
 
 router.post("/logout", protectCsrf, logoutUser);
 
-router.get("/me", protect, getMe);
+router.get("/me", authenticate, getMe);
 
-router.post("/refresh-token", protectCsrf, refreshAccessToken);
+router.post("/refresh-token", strictLimiter, protectCsrf, refreshAccessToken);
 
 export default router;

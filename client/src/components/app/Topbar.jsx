@@ -11,7 +11,7 @@ import {
 import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function TopBar() {
+export default function TopBar({ onProfileClick, onSettingsClick }) {
   const [credits] = useState(100);
   const [avatarLetter] = useState("K");
   const [showMenu, setShowMenu] = useState(false);
@@ -143,12 +143,16 @@ export default function TopBar() {
                 {/* Menu items */}
                 <div className="space-y-0.5">
                   {[
-                    { icon: <RiUser3Line size={15} />, label: "Profile" },
-                    { icon: <RiSettings3Line size={15} />, label: "Settings" },
-                  ].map(({ icon, label }) => (
+                    { icon: <RiUser3Line size={15} />, label: "Profile", onClick: onProfileClick },
+                    { icon: <RiSettings3Line size={15} />, label: "Settings", onClick: onSettingsClick },
+                  ].map(({ icon, label, onClick }) => (
                     <button
                       key={label}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-green-50 hover:text-green-700"
+                      onClick={() => {
+                        onClick?.();
+                        setShowMenu(false);
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-green-50 hover:text-green-700 cursor-pointer"
                     >
                       {icon}
                       <span>{label}</span>
