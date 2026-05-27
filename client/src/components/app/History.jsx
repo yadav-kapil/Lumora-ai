@@ -222,24 +222,20 @@ export default function History({ onClose }) {
   // Calculate Pagination values
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
   
-  // Safety check: Reset to page 1 if current page is out of bounds
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(1);
-    }
-  }, [filteredItems.length, totalPages, currentPage]);
+  // Safe rendering page calculation (defaults to 1 if out of bounds)
+  const activePage = currentPage > totalPages ? 1 : currentPage;
 
   const paginatedItems = filteredItems.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (activePage - 1) * ITEMS_PER_PAGE,
+    activePage * ITEMS_PER_PAGE
   );
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+    if (activePage > 1) setCurrentPage(activePage - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+    if (activePage < totalPages) setCurrentPage(activePage + 1);
   };
 
   const activeStyleLabel = STYLE_OPTIONS.find((s) => s.id === selectedStyle)?.label || "All Styles";
@@ -515,9 +511,9 @@ export default function History({ onClose }) {
             {/* Prev Page Button */}
             <button
               onClick={handlePrevPage}
-              disabled={currentPage === 1}
+              disabled={activePage === 1}
               className={`h-9 w-9 rounded-xl border flex items-center justify-center transition-all shadow-sm ${
-                currentPage === 1
+                activePage === 1
                   ? "border-slate-100 bg-slate-50 text-slate-350 cursor-not-allowed"
                   : "border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-350 hover:bg-slate-50 active:scale-95 cursor-pointer"
               }`}
@@ -531,7 +527,7 @@ export default function History({ onClose }) {
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold transition-all shadow-sm cursor-pointer ${
-                  currentPage === page
+                  activePage === page
                     ? "border-2 border-emerald-500 bg-emerald-50 text-emerald-600 shadow-[0_4px_12px_rgba(16,185,129,0.12)]"
                     : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:border-slate-300 active:scale-95"
                 }`}
@@ -543,9 +539,9 @@ export default function History({ onClose }) {
             {/* Next Page Button */}
             <button
               onClick={handleNextPage}
-              disabled={currentPage === totalPages}
+              disabled={activePage === totalPages}
               className={`h-9 w-9 rounded-xl border flex items-center justify-center transition-all shadow-sm ${
-                currentPage === totalPages
+                activePage === totalPages
                   ? "border-slate-100 bg-slate-50 text-slate-350 cursor-not-allowed"
                   : "border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-350 hover:bg-slate-50 active:scale-95 cursor-pointer"
               }`}

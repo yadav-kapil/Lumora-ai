@@ -9,7 +9,6 @@ import {
 } from "react-icons/ri";
 
 export default function Setting({ onClose }) {
-  const [defaultStyle, setDefaultStyle] = useState("realistic");
   const [defaultModel, setDefaultModel] = useState("pro");
   const [enhanceByDefault, setEnhanceByDefault] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
