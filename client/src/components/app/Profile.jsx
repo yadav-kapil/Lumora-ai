@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 import {
   RiUser3Line,
   RiCloseLine,
@@ -45,12 +47,22 @@ export default function Profile({ onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-350 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-          >
-            <RiCloseLine size={20} />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              to="/app/profile"
+              onClick={onClose}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 h-10 text-xs font-bold text-slate-650 hover:border-slate-350 hover:bg-slate-50 shadow-sm transition-all cursor-pointer"
+            >
+              Open Full Page
+            </Link>
+            <button
+              onClick={onClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-350 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+            >
+              <RiCloseLine size={20} />
+            </button>
+          </div>
+
         </div>
 
         {/* Form Body (Scrollable if content overflows, but fits fixed height nicely) */}
