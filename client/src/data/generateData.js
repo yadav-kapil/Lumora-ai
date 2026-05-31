@@ -88,7 +88,7 @@ export const MODELS = [
 
 export const RESOLUTIONS = [
   { id: "normal", label: "Normal", crown: false },
-  { id: "2k", label: "2K", crown: true },
+  { id: "hd", label: "HD", crown: true },
   { id: "4k", label: "4K", crown: true },
 ];
 

@@ -18,6 +18,10 @@ const imageGenerationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+      provider: {
+      type: String,
+      required: true,
+    },
 
     aspectRatio: {
       type: String,
@@ -27,7 +31,7 @@ const imageGenerationSchema = new mongoose.Schema(
 
     quality: {
       type: String,
-      enum: ["normal", "HD", "Ultra"],
+      enum: ["normal", "hd", "ultra"],
       default: "normal",
     },
 

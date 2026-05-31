@@ -33,3 +33,13 @@ export const calculateGenerationCost = (baseCredit, aspectRatio, quality) => {
 
   return credits;
 };
+
+export const getDimensions = (aspectRatio, quality) => {
+  const dimensions = IMAGE_DIMENSIONS[aspectRatio][quality];
+
+  if (!dimensions) {
+    throw new Error("Invalid aspect ratio or quality");
+  }
+
+  return { width: dimensions.width, height: dimensions.height };
+};

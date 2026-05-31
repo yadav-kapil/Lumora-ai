@@ -2,51 +2,45 @@ import { createClient } from "pexels";
 import config from "../../config/config.js";
 import ExpressError from "../../utils/ExpressError.js";
 import { calculateGenerationCost } from "../../utils/calculateCost.js";
-import User from "../../models/user.model.js";
 
 const client = createClient(config.STOCK_API_KEY);
 const BASE_CREDIT = 10;
 
-export const generateStockImage = async (promptObj) => {
-  if (!promptObj.userId) {
-    throw new ExpressError(400, "User ID is required");
-  }
+export const generateStockImage = async (promptObj, user) => {
+  const cost = calculateGenerationCost(BASE_CREDIT, promptObj.size, quality);
 
-  const cost = calculateGenerationCost(BASE_CREDIT, promptObj.size, promptObj.quality);
-
-  const user = await User.findById(promptObj.userId);
-  if (!user) {
-    throw new ExpressError(404, "User not found");
-  }
-  if (user.credits < cost) {
+  if (promptObj.user.credits < cost) {
     throw new ExpressError(
       403,
-      `Insufficient credits. Required: ${cost}, available: ${user.credits}`
+      `Insufficient credits. Required: ${cost}, available: ${promptObj.user.credits}`,
     );
   }
 
   // Pexels orientation expects: "landscape" | "portrait" | "square"
-  const res = await client.photos.search({
+  const result = await client.photos.search({
     query: promptObj.prompt,
     orientation: promptObj.size,
-    per_page: 1,
+    per_page: 10,
   });
 
-  if (!res.photos || !res.photos.length) {
-    throw new ExpressError(500, "No image found for prompt: " + promptObj.prompt);
+  if (!result.photos || !result.photos.length) {
+    throw new ExpressError(
+      500,
+      "No image found for prompt: " + promptObj.prompt,
+    );
   }
 
-  const imageUrl = res.photos[0].src.large2x;
+  const randomIndex = Math.floor(Math.random() * result.photos.length);
+  const imageUrl = result.photos[randomIndex].src.large2x;
 
-  // Return all data needed by controller — no DB writes here
   return {
-    imageUrls : [imageUrl],
+    imageUrls: [imageUrl],
     cost,
-    user,                                         // pass user so controller can update credits
     prompt: promptObj.prompt,
-    model: promptObj.model,
+    model,
+    provider,
     size: promptObj.size,
-    quality : promptObj.quality,
+    quality,
     numberOfImages: promptObj.numberOfImages || 1,
   };
 };
