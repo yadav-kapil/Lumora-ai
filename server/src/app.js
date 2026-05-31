@@ -8,6 +8,7 @@ import { globalLimiter } from "./middlewares/rateLimiter.middleware.js";
 
 //Routers Modules
 import authRoutes from "./routes/user.routes.js";
+import imageGenerationRoutes from "./routes/imageGeneration.routes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api", globalLimiter);
 
 // routes
 app.use("/api/auth", authRoutes);
+app.use("/api/text-to-image", imageGenerationRoutes);
 
 // error handlers
 app.use((req, res, next) => {

@@ -26,13 +26,18 @@ if (!process.env.NODE_ENV) {
   throw new Error("CLIENT_ORIGIN is not defined");
 }
 
+if (!process.env.STOCK_API_KEY) {
+  throw new Error("CLIENT_ORIGIN is not defined");
+}
+
 const config = {
   PORT: process.env.PORT,
   MONGO_URI: process.env.MONGO_URI,
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN.trim(),
-  NODE_ENV: process.env.NODE_ENV
+  NODE_ENV: process.env.NODE_ENV,
+  STOCK_API_KEY: process.env.STOCK_API_KEY
 };
 
 export default config;

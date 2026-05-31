@@ -21,6 +21,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    totalImagesGenerated: {
+      type: Number,
+      default: 0,
+    },
+
+    credits: {
+      type: Number,
+      default: 100,
+    },
   },
   {
     timestamps: true,
