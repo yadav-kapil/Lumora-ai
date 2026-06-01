@@ -4,7 +4,6 @@ import {
   RiSmartphoneLine,
 } from "react-icons/ri";
 
-
 export const STYLES = [
   {
     id: "realistic",
@@ -44,13 +43,8 @@ export const SIZES = [
     dims: "1024 × 1024",
     ratio: "1/1",
     previewWidth: "340px",
-
-    indicatorWidth: "18px",
-    indicatorHeight: "18px",
-
     icon: RiTabletLine,
   },
-
   {
     id: "portrait",
     label: "Portrait",
@@ -58,13 +52,8 @@ export const SIZES = [
     dims: "768 × 1344",
     ratio: "9/16",
     previewWidth: "230px",
-
-    indicatorWidth: "12px",
-    indicatorHeight: "22px",
-
     icon: RiSmartphoneLine,
   },
-
   {
     id: "landscape",
     label: "Landscape",
@@ -72,24 +61,32 @@ export const SIZES = [
     dims: "1344 × 768",
     ratio: "16/9",
     previewWidth: "100%",
-
-    indicatorWidth: "22px",
-    indicatorHeight: "14px",
-
     icon: RiComputerLine,
   },
 ];
 
 export const MODELS = [
-  { id: "basic", label: "Basic", crown: false, desc: "Fast & efficient" },
-  { id: "pro", label: "Pro", crown: true, desc: "Higher quality" },
-  { id: "premium", label: "Premium", crown: true, desc: "Best results" },
+  {
+    provider: "stock",
+    label: "Stock Images",
+    models: [
+      { id: "pexels", label: "Pexels", crown: false, desc: "Fast & efficient" },
+    ],
+  },
+  {
+    provider: "flux",
+    label: "Flux Models",
+    models: [
+      { id: "schnell", label: "Flex-Schnell", crown: true, desc: "Higher quality" },
+      { id: "dev", label: "Flux-Dev", crown: true, desc: "Best results" },
+    ],
+  },
 ];
 
 export const RESOLUTIONS = [
   { id: "normal", label: "Normal", crown: false },
   { id: "hd", label: "HD", crown: true },
-  { id: "4k", label: "4K", crown: true },
+  { id: "ultra", label: "4K", crown: true },
 ];
 
 export const IMAGE_COUNTS = [

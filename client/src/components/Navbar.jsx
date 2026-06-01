@@ -67,7 +67,7 @@ const Navbar = ({ showBanner }) => {
           </NavLink>
 
           <NavLink
-            to="/app/generate"
+            to="/app/text-to-image"
             onClick={() => setSidebarOpen(false)}
             className="hover:text-green-600 relative overflow-hidden group h-6"
           >

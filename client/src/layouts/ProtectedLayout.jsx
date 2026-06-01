@@ -5,6 +5,7 @@ import Sidebar from "../components/app/Sidebar";
 import Topbar from "../components/app/Topbar";
 import Profile from "../components/app/Profile";
 import Setting from "../components/app/Setting";
+import { AppContextProvider } from "../context/app/AppContext";
 
 const ProtectedLayout = () => {
   const { pathname } = useLocation();
@@ -20,7 +21,8 @@ const ProtectedLayout = () => {
   const { isAuthenticated} = useAuthContext();
 
   return isAuthenticated ? (
-    <div className="flex min-h-screen bg-slate-50/70">
+    <AppContextProvider>
+      <div className="flex min-h-screen bg-slate-50/70">
       {/* Mobile Backdrop Overlay */}
       {!sidebarCollapsed && (
         <div
@@ -53,6 +55,7 @@ const ProtectedLayout = () => {
         </main>
       </div>
     </div>
+    </AppContextProvider>
   ) : (
     <Navigate to="/auth/login" replace />
   );

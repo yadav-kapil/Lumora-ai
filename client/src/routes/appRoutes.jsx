@@ -11,7 +11,7 @@ import VideoPage from "../pages/app/VideoPage";
 
 export const appRoutes = [
   {
-    path: "generate",
+    path: "text-to-image",
     element: <GeneratePage />,
   },
   {

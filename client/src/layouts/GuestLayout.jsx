@@ -15,7 +15,7 @@ const GuestLayout = () => {
 
 
   return isAuthenticated ? (
-    <Navigate to="/app/generate" replace/>
+    <Navigate to="/app/text-to-image" replace/>
   ) : (
     <Outlet />
   );

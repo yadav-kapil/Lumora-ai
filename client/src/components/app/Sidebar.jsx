@@ -44,7 +44,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           id: "text-to-image",
           label: "Text to Image",
           icon: <RiSparklingFill size={18} className="text-emerald-500" />,
-          path: "/app/generate",
+          path: "/app/text-to-image",
         },
         {
           id: "image-to-image",

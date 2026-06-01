@@ -39,7 +39,7 @@ const Signup = () => {
       return;
     }
     console.log(result.data);
-    navigate("/app/generate", { replace: true });
+    navigate("/app/text-to-image", { replace: true });
   };
 
   return (

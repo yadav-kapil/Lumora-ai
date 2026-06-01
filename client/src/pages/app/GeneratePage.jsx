@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   RiSparklingFill,
   RiVipCrownFill,
@@ -16,147 +16,75 @@ import {
   MODELS,
   RESOLUTIONS,
   IMAGE_COUNTS,
-  HISTORY as INITIAL_HISTORY,
 } from "../../data/generateData";
 import History from "../../components/app/History";
-
-function Dropdown({ selected, options, onChange }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef();
-  const current = options.find((o) => o.id === selected);
-
-  useEffect(() => {
-    const close = (e) => {
-      if (!ref.current?.contains(e.target)) setOpen(false);
-    };
-
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative w-full">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50/40 hover:shadow-md cursor-pointer"
-      >
-        <div className="flex items-center gap-2 overflow-hidden">
-          {current?.crown && (
-            <RiVipCrownFill size={12} className="shrink-0 text-amber-400" />
-          )}
-          <span className="truncate">{current?.label}</span>
-          {current?.desc && (
-            <span className="truncate text-xs font-normal text-slate-400">
-              — {current.desc}
-            </span>
-          )}
-        </div>
-
-        <RiArrowDownSLine
-          size={16}
-          className={`shrink-0 text-slate-400 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 bottom-[calc(100%+8px)] z-30 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)] backdrop-blur-xl">
-          {options.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => {
-                onChange(opt.id);
-                setOpen(false);
-              }}
-              className={`flex w-full items-center justify-between px-4 py-3 text-sm transition-all cursor-pointer ${
-                selected === opt.id
-                  ? "bg-emerald-50 font-semibold text-emerald-700"
-                  : "text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              <div className="flex items-center gap-2 overflow-hidden">
-                {opt.crown && (
-                  <RiVipCrownFill size={12} className="text-amber-400" />
-                )}
-                <span>{opt.label}</span>
-                {opt.desc && (
-                  <span className="truncate text-xs text-slate-400">
-                    — {opt.desc}
-                  </span>
-                )}
-              </div>
-
-              {selected === opt.id && (
-                <RiCheckLine size={14} className="text-emerald-600" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+import Dropdown from "../../components/app/Dropdown";
+import useTextToImage from "../../hooks/useTextToImage";
+import { useAppContext } from "../../context/app/AppContext";
 
 export default function GeneratePage() {
-  const [prompt, setPrompt] = useState(
-    "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
-  );
+  const [promptObj, setPromptObj] = useState({
+    prompt: "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
+    style: "realistic",
+    size: "landscape",
+    model: "pexels",
+    provider: "stock",
+    quality: "normal",
+    numberOfImages: 1,
+  });
 
-  const [style, setStyle] = useState("realistic");
-  const [size, setSize] = useState("landscape");
-  const [model, setModel] = useState("basic");
-  const [res, setRes] = useState("normal");
-  const [count, setCount] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
-
-  // Added interactive states for premium behavior
   const [previewImg, setPreviewImg] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [historyList, setHistoryList] = useState(INITIAL_HISTORY);
 
-  const ratio = SIZES.find((s) => s.id === size) || SIZES[0];
+  const { generateImage, isLoading, error } = useTextToImage();
+  const { historyByType } = useAppContext();
+  
+  const ratio = SIZES.find((s) => s.id === promptObj.size) || SIZES[0];
 
-  const handleGenerate = () => {
-    if (!prompt.trim()) return;
-    setIsGenerating(true);
-
-    // Mock API generation delay
-    setTimeout(() => {
-      // Pick a beautiful design graphic from unsplash based on style
-      const sampleImages = {
-        realistic: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&fit=crop",
-        anime: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&fit=crop",
-        "3d": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&fit=crop",
-        digital: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&fit=crop",
-        sketch: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&fit=crop",
-      };
-      const newImg = sampleImages[style] || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&fit=crop";
-
-      setPreviewImg(newImg);
-      setIsGenerating(false);
-
-      // Add to history list
-      setHistoryList((prev) => [newImg, ...prev.slice(0, 4)]);
-    }, 1800);
-  };
+  const textToImageHistory = historyByType.textToImage;
 
   const handleClear = () => {
     setPreviewImg("");
   };
 
   const handleReset = () => {
-    setPrompt("");
-    setStyle("realistic");
-    setSize("landscape");
-    setModel("basic");
-    setRes("normal");
-    setCount(1);
+    setPromptObj({
+      prompt: "",
+      style: "realistic",
+      size: "landscape",
+      model: "pexels",
+      provider: "stock",
+      quality: "normal",
+      numberOfImages: 1,
+    });
     setPreviewImg("");
+  };
+
+  const handleModelChange = (modelId) => {
+    const group = MODELS.find((g) => g.models.some((m) => m.id === modelId));
+    const provider = group ? group.provider : "stock";
+    setPromptObj((prev) => ({ ...prev, model: modelId, provider }));
+  };
+
+  const handleGenerate = async () => {
+    if (!promptObj.prompt.trim()) return;
+    const result = await generateImage(promptObj);
+    if (result && result.success) {
+      const historyItem = result.data.historyItem;
+      if (historyItem.imageUrls.length > 0) {
+        setPreviewImg(historyItem.imageUrls[0].url);
+      }
+    }
   };
 
   return (
     <div className="grid grid-cols-1 gap-5 bg-slate-50/70 p-3 sm:p-5 lg:grid-cols-2 lg:gap-6 lg:p-6">
+      {error && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 lg:col-span-2">
+          {error}
+        </div>
+      )}
+
       {/* ───────── LEFT ───────── */}
       <div className="flex flex-col gap-7 rounded-[28px] border border-slate-200/70 bg-white/95 p-7 shadow-[0_10px_40px_rgba(15,23,42,0.04)] backdrop-blur-xl">
         {/* Header */}
@@ -183,8 +111,8 @@ export default function GeneratePage() {
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 transition-all focus-within:border-emerald-300 focus-within:bg-white focus-within:shadow-sm">
             <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              value={promptObj.prompt}
+              onChange={(e) => setPromptObj((prev) => ({ ...prev, prompt: e.target.value }))}
               maxLength={1000}
               rows={4}
               placeholder="Describe your image…"
@@ -193,7 +121,7 @@ export default function GeneratePage() {
 
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[11px] text-slate-300">
-                {prompt.length}/1000
+                {promptObj.prompt.length}/1000
               </span>
 
               <div className="relative">
@@ -221,9 +149,9 @@ export default function GeneratePage() {
             {STYLES.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setStyle(s.id)}
+                onClick={() => setPromptObj((prev) => ({ ...prev, style: s.id }))}
                 className={`group relative shrink-0 overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
-                  style === s.id
+                  promptObj.style === s.id
                     ? "border-emerald-500 bg-white shadow-lg shadow-emerald-100"
                     : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 }`}
@@ -241,7 +169,7 @@ export default function GeneratePage() {
                   className="h-[62px] w-[92px] object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                {style === s.id && (
+                {promptObj.style === s.id && (
                   <>
                     <div className="absolute inset-0 bg-emerald-500/10" />
                     <div className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 shadow-sm">
@@ -252,7 +180,7 @@ export default function GeneratePage() {
 
                 <div
                   className={`border-t px-2 py-2 text-center text-[11px] font-semibold ${
-                    style === s.id
+                    promptObj.style === s.id
                       ? "border-emerald-100 text-emerald-600"
                       : "border-slate-100 text-slate-600"
                   }`}
@@ -276,9 +204,9 @@ export default function GeneratePage() {
               return (
                 <button
                   key={sz.id}
-                  onClick={() => setSize(sz.id)}
+                  onClick={() => setPromptObj((prev) => ({ ...prev, size: sz.id }))}
                   className={`flex flex-col items-center gap-1 rounded-2xl border-2 px-2 py-3 transition-all duration-200 cursor-pointer ${
-                    size === sz.id
+                    promptObj.size === sz.id
                       ? "border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100"
                       : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                   }`}
@@ -286,13 +214,13 @@ export default function GeneratePage() {
                   <Icon
                     size={22}
                     className={`transition-colors ${
-                      size === sz.id ? "text-emerald-500" : "text-slate-400"
+                      promptObj.size === sz.id ? "text-emerald-500" : "text-slate-400"
                     }`}
                   />
 
                   <span
                     className={`text-[11px] font-semibold ${
-                      size === sz.id ? "text-emerald-600" : "text-slate-700"
+                      promptObj.size === sz.id ? "text-emerald-600" : "text-slate-700"
                     }`}
                   >
                     {sz.label}
@@ -304,13 +232,25 @@ export default function GeneratePage() {
           </div>
         </div>
 
-        {/* Model + Resolution */}
+        {/* Model */}
+        <div>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Model
+          </p>
+          <Dropdown selected={promptObj.model} options={MODELS} onChange={handleModelChange} />
+        </div>
+
+        {/* Number of Images + Resolution */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Model
+              Number of Images
             </p>
-            <Dropdown selected={model} options={MODELS} onChange={setModel} />
+            <Dropdown
+              selected={promptObj.numberOfImages}
+              options={IMAGE_COUNTS}
+              onChange={(val) => setPromptObj((prev) => ({ ...prev, numberOfImages: val }))}
+            />
           </div>
 
           <div>
@@ -322,9 +262,9 @@ export default function GeneratePage() {
               {RESOLUTIONS.map((r) => (
                 <button
                   key={r.id}
-                  onClick={() => setRes(r.id)}
+                  onClick={() => setPromptObj((prev) => ({ ...prev, quality: r.id }))}
                   className={`relative flex flex-1 items-center justify-center rounded-2xl border-2 py-3 text-xs font-semibold transition-all cursor-pointer ${
-                    res === r.id
+                    promptObj.quality === r.id
                       ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                   }`}
@@ -342,29 +282,16 @@ export default function GeneratePage() {
           </div>
         </div>
 
-        {/* Number of Images */}
-        <div>
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Number of Images
-          </p>
-
-          <Dropdown
-            selected={count}
-            options={IMAGE_COUNTS}
-            onChange={setCount}
-          />
-        </div>
-
         {/* Actions */}
         <div className="flex gap-3 pt-1">
           <button
             onClick={handleGenerate}
-            disabled={isGenerating}
+            disabled={isLoading || !promptObj.prompt.trim()}
             className="relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 py-3.5 text-sm font-bold text-white shadow-xl shadow-emerald-300/40 transition-all hover:-translate-y-px hover:brightness-110 disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
           >
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_2.4s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             <RiSparklingFill size={15} />
-            {isGenerating ? "Generating..." : "Generate Image"}
+            {isLoading ? "Generating..." : "Generate Image"}
           </button>
 
           <button
@@ -405,7 +332,7 @@ export default function GeneratePage() {
                 aspectRatio: ratio.ratio,
               }}
             >
-              {isGenerating ? (
+              {isLoading ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-50/50 backdrop-blur-xs">
                   <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
                   <p className="text-xs font-semibold text-slate-500">
@@ -450,7 +377,7 @@ export default function GeneratePage() {
           <div className="mt-5 flex gap-3">
             <button
               onClick={handleGenerate}
-              disabled={isGenerating || !prompt}
+              disabled={isLoading || !promptObj.prompt.trim()}
               className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <RiRefreshLine size={14} />
@@ -497,7 +424,7 @@ export default function GeneratePage() {
             </button>
           </div>
 
-          {historyList.length === 0 ? (
+          {textToImageHistory.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-12">
               <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-100">
                 <RiHistoryLine size={24} className="text-slate-400" />
@@ -511,14 +438,15 @@ export default function GeneratePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-              {historyList.map((img, i) => (
+              {textToImageHistory.slice(0, 5).map((item, i) => {
+                return (
                 <button
-                  key={i}
-                  onClick={() => setPreviewImg(img)}
+                  key={item._id || i}
+                  onClick={() => setPreviewImg(item.imageUrls[0].url)}
                   className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg cursor-pointer"
                 >
                   <img
-                    src={img}
+                    src={item.imageUrls[0].url}
                     alt=""
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
@@ -527,7 +455,8 @@ export default function GeneratePage() {
                     <RiDownloadLine size={13} className="text-slate-700" />
                   </div>
                 </button>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>

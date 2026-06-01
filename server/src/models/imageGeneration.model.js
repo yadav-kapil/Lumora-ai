@@ -8,6 +8,13 @@ const imageGenerationSchema = new mongoose.Schema(
       required: true,
     },
 
+    type: {
+      type: String,
+      enum: ["textToImage"],
+      default: "textToImage",
+      required: true,
+    },
+
     prompt: {
       type: String,
       required: true,
@@ -18,12 +25,12 @@ const imageGenerationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-      provider: {
+    provider: {
       type: String,
       required: true,
     },
 
-    aspectRatio: {
+    size: {
       type: String,
       enum: ["square", "portrait", "landscape"],
       required: true,
@@ -44,8 +51,15 @@ const imageGenerationSchema = new mongoose.Schema(
 
     imageUrls: [
       {
-        type: String,
-        required: true,
+        url: {
+          type: String,
+          required: true,
+        },
+
+        publicId: {
+          type: String,
+          required: true,
+        },
       },
     ],
 

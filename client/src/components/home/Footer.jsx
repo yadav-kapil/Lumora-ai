@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   const exploreLinks = [
-    { name: "Create Image", path: "/app/generate" },
+    { name: "Create Image", path: "/app/text-to-image" },
     { name: "Contact", path: "/contact" },
     { name: "Pricing", path: "/pricing" }
   ];
