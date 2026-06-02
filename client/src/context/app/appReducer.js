@@ -1,4 +1,5 @@
 export const appState = {
+  isLoading: true,
   fullHistory: [],
   historyByType: {
     textToImage: [],
@@ -9,7 +10,7 @@ export const appState = {
 };
 
 const removeHistory = (history, historyId) => {
-  return history.filter((item) => item._id !== historyId );
+  return history.filter((item) => item._id !== historyId);
 };
 
 const removeHistoryByType = (historyByType, historyId) => {
@@ -23,33 +24,34 @@ const removeHistoryByType = (historyByType, historyId) => {
 
 export const appReducer = (state, action) => {
   switch (action.type) {
-    case "SET_FULL_HISTORY":
-      return {
-        ...state,
-        fullHistory: action.payload,
+    case "SET_HISTORY": {
+      const fullHistory = action.payload;
+      const historyByType = {
+        textToImage: fullHistory.filter((item) => !item.type || item.type === "textToImage"),
+        imageUpscaler: fullHistory.filter((item) => item.type === "imageUpscaler"),
+        imageToImage: fullHistory.filter((item) => item.type === "imageToImage"),
+        video: fullHistory.filter((item) => item.type === "video"),
       };
-
-    case "SET_HISTORY_BY_TYPE":
       return {
         ...state,
+        isLoading: false,
+        fullHistory,
+        historyByType,
+      };
+    }
+
+    case "ADD_HISTORY_ITEM": {
+      const newItem = action.payload;
+      const type = newItem.type || "textToImage";
+      return {
+        ...state,
+        fullHistory: [newItem, ...state.fullHistory],
         historyByType: {
           ...state.historyByType,
-          [action.payload.type]: action.payload.history,
+          [type]: [newItem, ...(state.historyByType[type] || [])],
         },
       };
-
-    case "ADD_HISTORY_ITEM":
-      return {
-        ...state,
-        fullHistory: [action.payload, ...state.fullHistory],
-        historyByType: {
-          ...state.historyByType,
-          [action.payload.type]: [
-            action.payload,
-            ...(state.historyByType[action.payload.type] || []),
-          ],
-        },
-      };
+    }
 
     case "DELETE_HISTORY":
       return {

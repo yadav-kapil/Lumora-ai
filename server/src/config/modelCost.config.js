@@ -38,5 +38,18 @@ export const generationCost = {
       portrait: { normal: 20, hd: 40, ultra: 70 },
       landscape: { normal: 20, hd: 40, ultra: 70 },
     },
+    "dev/image-to-image": {
+      square: { normal: 25, hd: 50, ultra: 100 },
+      portrait: { normal: 25, hd: 50, ultra: 100 },
+      landscape: { normal: 25, hd: 50, ultra: 100 },
+    },
+  },
+
+  "nano-banana-2": {
+    edit: {
+      square: { normal: 15, hd: 30, ultra: 60 },
+      portrait: { normal: 15, hd: 30, ultra: 60 },
+      landscape: { normal: 15, hd: 30, ultra: 60 },
+    },
   },
 };

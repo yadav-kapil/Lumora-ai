@@ -1,10 +1,22 @@
 import { useState } from "react";
-import { RiUser3Line, RiMailLine, RiUserLine, RiCalendarLine, RiVipCrownFill, RiCoinLine, RiUploadCloud2Line } from "react-icons/ri";
+import {
+  RiUser3Line,
+  RiMailLine,
+  RiUserLine,
+  RiCalendarLine,
+  RiVipCrownFill,
+  RiCoinLine,
+  RiUploadCloud2Line,
+} from "react-icons/ri";
+import { useAuthContext } from "../../context/auth/AuthContext";
 
 export default function ProfilePage() {
-  const [username, setUsername] = useState("Kapil Yadav");
-  const [email] = useState("kapil@example.com");
-  const [avatarLetter, setAvatarLetter] = useState("K");
+  const { user } = useAuthContext();
+  const [username, setUsername] = useState(user?.username || "");
+  const [email] = useState(user?.email || "");
+  const [avatarLetter, setAvatarLetter] = useState(
+    user?.username ? user.username.charAt(0).toUpperCase() : "?",
+  );
   const [saved, setSaved] = useState(false);
 
   const handleSave = (e) => {
@@ -46,10 +58,17 @@ export default function ProfilePage() {
               <span>{avatarLetter}</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-800">Profile Picture</h4>
-              <p className="text-xs text-slate-400 mt-0.5">PNG or JPG. Max size 2MB</p>
+              <h4 className="text-sm font-bold text-slate-800">
+                Profile Picture
+              </h4>
+              <p className="text-xs text-slate-400 mt-0.5">
+                PNG or JPG. Max size 2MB
+              </p>
               <div className="flex items-center gap-2 mt-2.5">
-                <button type="button" className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 cursor-pointer">
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 cursor-pointer"
+                >
                   <RiUploadCloud2Line size={13} />
                   Upload
                 </button>
@@ -101,8 +120,14 @@ export default function ProfilePage() {
                 <RiVipCrownFill size={15} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Plan Status</p>
-                <p className="text-xs font-black text-slate-800 mt-0.5">Premium Plan</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                  Plan Status
+                </p>
+                <p className="text-xs font-black text-slate-800 mt-0.5">
+                  {user?.plan
+                    ? `${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} Plan`
+                    : "Free Plan"}
+                </p>
               </div>
             </div>
 
@@ -111,8 +136,12 @@ export default function ProfilePage() {
                 <RiCoinLine size={15} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Credits</p>
-                <p className="text-xs font-black text-slate-800 mt-0.5">100 remaining</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                  Credits
+                </p>
+                <p className="text-xs font-black text-slate-800 mt-0.5">
+                  {user?.credits ?? 0} remaining
+                </p>
               </div>
             </div>
           </div>

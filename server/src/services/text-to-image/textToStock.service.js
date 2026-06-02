@@ -5,7 +5,7 @@ import ExpressError from "../../utils/ExpressError.js";
 const client = createClient(config.STOCK_API_KEY);
 
 export const generateStockImage = async (promptObj) => {
-  const { provider, model, size, quality, numberOfImages, prompt } = promptObj;
+  const { provider, model, size, quality, numberOfImages, prompt, style } = promptObj;
 
   // Pexels orientation expects: "landscape" | "portrait" | "square"
   const result = await client.photos.search({
@@ -19,21 +19,21 @@ export const generateStockImage = async (promptObj) => {
   }
 
   const startIndex = Math.floor(Math.random() * result.photos.length);
-  const imageUrls = [];
+  const outputImageUrls = [];
 
   for (let i = 0; i < numberOfImages; i++) {
     const index = (startIndex + i) % result.photos.length;
-    imageUrls.push(result.photos[index].src.large2x);
+    outputImageUrls.push(result.photos[index].src.large2x);
   }
 
-
   return {
-    imageUrls,
+    outputImageUrls,
     prompt,
     model,
     provider,
     size,
     quality,
     numberOfImages,
+    style: style || "realistic",
   };
 };

@@ -52,6 +52,9 @@ export const registerUser = wrapAsync(async (req, res) => {
   });
   const accessToken = generateAccessToken(user._id);
 
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
   return res
     .status(201)
     .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
@@ -59,11 +62,7 @@ export const registerUser = wrapAsync(async (req, res) => {
       success: true,
       message: "User Added Successfully",
       accessToken,
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-      },
+      user: userResponse,
     });
 });
 
@@ -109,6 +108,9 @@ export const loginUser = wrapAsync(async (req, res) => {
   // generate access token
   const accessToken = generateAccessToken(user._id);
 
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
   // send response
   return res
     .status(200)
@@ -117,11 +119,7 @@ export const loginUser = wrapAsync(async (req, res) => {
       success: true,
       message: "Logged In Successfully",
       accessToken,
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-      },
+      user: userResponse,
     });
 });
 

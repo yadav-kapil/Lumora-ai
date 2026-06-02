@@ -1,43 +1,93 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   RiSparklingFill,
   RiImageAddLine,
   RiDownloadLine,
   RiRefreshLine,
-  RiArrowLeftRightLine,
-  RiCheckLine,
+  RiCloseLine,
+  RiArrowDownSLine,
+  RiVipCrownFill,
 } from "react-icons/ri";
+import { useAuthContext } from "../../context/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { MODELS } from "../../data/imageToImageData";
+import { useToast } from "../../context/ToastContext";
+import useImageToImage from "../../hooks/useImageToImage";
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 
 export default function ImageToImagePage() {
-  const [sourceImg, setSourceImg] = useState("");
-  const [prompt, setPrompt] = useState("Make the background snowy and add vintage lighting.");
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const isFreePlan = !user || user.plan === "free";
+
+  const {
+    generateImage,
+    isLoading: generating,
+    error,
+    setError,
+  } = useImageToImage();
+
+  const [uploadedImages, setUploadedImages] = useState([]); // Array of { id, file, preview }
+  const [selectedModel, setSelectedModel] = useState(MODELS[0]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [prompt, setPrompt] = useState(
+    "Make the background snowy and add vintage lighting.",
+  );
   const [strength, setStrength] = useState(0.65);
-  const [generating, setGenerating] = useState(false);
   const [resultImg, setResultImg] = useState("");
-  const [sliderPos, setSliderPos] = useState(50);
-  const [style, setStyle] = useState("cinematic");
+  const [quality, setQuality] = useState("normal");
+  const [numberOfImages, setNumberOfImages] = useState(1);
+  const fileInputRef = useRef(null);
 
-  const handleUpload = (e) => {
-    // Mock upload a landscape photo
-    setSourceImg("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop");
+  useEffect(() => {
+    if (error) {
+      showToast(error, "error", "Generation Failed");
+      setError("");
+    }
+  }, [error, showToast, setError]);
+
+  const handleGenerate = async () => {
+    if (isFreePlan) {
+      showToast(
+        "This is a premium feature, upgrade to Pro",
+        "alert",
+        "Premium Feature",
+      );
+      return;
+    }
+    if (uploadedImages.length === 0) return;
     setResultImg("");
-  };
 
-  const handleGenerate = () => {
-    if (!sourceImg) return;
-    setGenerating(true);
-    setTimeout(() => {
-      // Mock result (snowy lake landscape)
-      setResultImg("https://images.unsplash.com/photo-1482862549707-f63cb32c5fd9?w=800&fit=crop");
-      setGenerating(false);
-    }, 2000);
-  };
+    const inputImageUrls = await Promise.all(
+      uploadedImages.map((img) => readFileAsDataUrl(img.file)),
+    );
 
-  const handleReset = () => {
-    setSourceImg("");
-    setResultImg("");
-    setPrompt("");
-    setStrength(0.5);
+    const result = await generateImage({
+      type: "imageToImage",
+      prompt,
+      model: selectedModel.model,
+      provider: selectedModel.provider,
+      strength,
+      quality,
+      numberOfImages,
+      inputImageUrls,
+    });
+
+    if (result && result.success) {
+      const historyItem = result.data.historyItem;
+      const images = historyItem.outputImageUrls || historyItem.imageUrls || [];
+      if (images.length > 0) {
+        setResultImg(images[0].url);
+      }
+    }
   };
 
   return (
@@ -51,46 +101,181 @@ export default function ImageToImagePage() {
               <RiImageAddLine size={22} />
             </div>
             <div>
-              <h2 className="text-[18px] font-black text-slate-900 tracking-tight leading-none">Image to Image</h2>
-              <p className="text-xs text-slate-400 mt-1.5">Modify structure, style, and details of existing photos</p>
+              <h2 className="text-[18px] font-black text-slate-900 tracking-tight leading-none flex items-center gap-1.5">
+                Image to Image
+                {isFreePlan && (
+                  <button
+                    onClick={() => navigate("/app/billing")}
+                    className="cursor-pointer hover:scale-110 active:scale-95 transition-all text-amber-500 shrink-0 flex items-center justify-center p-0.5"
+                    title="Premium Feature - Subscribe to unlock"
+                  >
+                    <RiVipCrownFill size={16} />
+                  </button>
+                )}
+              </h2>
+              <p className="text-xs text-slate-400 mt-1.5">
+                Modify structure, style, and details of existing photos
+              </p>
             </div>
           </div>
 
-          {/* Step 1: Upload Image */}
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">1. Upload Source Image</label>
-            {sourceImg ? (
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 group aspect-video bg-slate-50 flex items-center justify-center">
-                <img src={sourceImg} alt="Source" className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                  <button
-                    onClick={() => setSourceImg("")}
-                    className="px-4 py-2 bg-red-650 hover:bg-red-600 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition-all"
-                  >
-                    Remove Photo
-                  </button>
-                </div>
+          {/* Model Selection Dropdown */}
+          <div className="relative">
+            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">
+              Model
+            </label>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-4 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer text-left"
+            >
+              <div className="flex flex-col">
+                <span className="text-xs font-black text-slate-800">
+                  {selectedModel.name}
+                </span>
+                <span className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                  {selectedModel.description}
+                </span>
               </div>
-            ) : (
-              <div
-                onClick={handleUpload}
-                className="border-2 border-dashed border-slate-200/80 rounded-2xl p-6 text-center hover:border-blue-400 hover:bg-blue-50/20 transition-all cursor-pointer bg-slate-50/30 flex flex-col items-center justify-center gap-3 min-h-[160px]"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-150 text-slate-500 shadow-inner">
-                  <RiImageAddLine size={22} />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-700">Click to upload image</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Supports PNG, JPG up to 10MB</p>
-                </div>
+              <RiArrowDownSLine
+                size={18}
+                className={`text-slate-450 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute left-0 right-0 z-40 mt-2 rounded-2xl border border-slate-100 bg-white p-2.5 shadow-xl">
+                {MODELS.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedModel(m);
+                      setDropdownOpen(false);
+                      if (uploadedImages.length > m.maxImages) {
+                        const toTrim = uploadedImages.slice(m.maxImages);
+                        toTrim.forEach((img) =>
+                          URL.revokeObjectURL(img.preview),
+                        );
+                        setUploadedImages((prev) => prev.slice(0, m.maxImages));
+                      }
+                    }}
+                    className={`w-full flex flex-col p-3 rounded-xl text-left transition-all cursor-pointer hover:bg-slate-50 ${
+                      selectedModel.id === m.id ? "bg-slate-50" : ""
+                    }`}
+                  >
+                    <span className="text-xs font-black text-slate-800">
+                      {m.name}
+                    </span>
+                    <span className="text-[10px] text-slate-455 mt-1">
+                      {m.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Step 1: Upload Images */}
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">
+              Upload Source Images
+            </label>
+            <input
+              type="file"
+              multiple={selectedModel.maxImages > 1}
+              accept="image/*"
+              ref={fileInputRef}
+              disabled={uploadedImages.length >= selectedModel.maxImages}
+              onChange={(e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+
+                const remainingSlots =
+                  selectedModel.maxImages - uploadedImages.length;
+                if (remainingSlots <= 0) return;
+
+                const filesToUpload = files.slice(0, remainingSlots);
+                const newImages = filesToUpload.map((file) => ({
+                  id: Math.random().toString(36).substr(2, 9),
+                  file,
+                  preview: URL.createObjectURL(file),
+                }));
+                setUploadedImages((prev) => [...prev, ...newImages]);
+                setResultImg("");
+              }}
+              className="hidden"
+            />
+            <div
+              onClick={() => {
+                if (uploadedImages.length < selectedModel.maxImages) {
+                  fileInputRef.current?.click();
+                }
+              }}
+              className={`border-2 border-dashed border-slate-200/80 rounded-2xl p-6 text-center hover:border-blue-400 hover:bg-blue-50/20 transition-all cursor-pointer bg-slate-50/30 flex flex-col items-center justify-center gap-3 min-h-[140px] ${
+                uploadedImages.length >= selectedModel.maxImages
+                  ? "opacity-50 cursor-not-allowed pointer-events-none"
+                  : ""
+              }`}
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-150 text-slate-500 shadow-inner">
+                <RiImageAddLine size={22} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-700">
+                  {uploadedImages.length >= selectedModel.maxImages
+                    ? "Image limit reached"
+                    : "Click to upload images"}
+                </p>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {selectedModel.maxImages === 1
+                    ? "This model supports exactly 1 source image."
+                    : `Supports up to ${selectedModel.maxImages} source images.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Thumbnail Preview Row */}
+            {uploadedImages.length > 0 && (
+              <div className="mt-4 grid grid-cols-4 gap-2.5">
+                {uploadedImages.map((img) => (
+                  <div
+                    key={img.id}
+                    className="group relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-xs"
+                  >
+                    <img
+                      src={img.preview}
+                      alt="Upload Preview"
+                      className="h-full w-full object-cover"
+                    />
+                    {/* Hover Overlay with cross corner */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          URL.revokeObjectURL(img.preview);
+                          setUploadedImages((prev) =>
+                            prev.filter((item) => item.id !== img.id),
+                          );
+                        }}
+                        className="absolute top-1 right-1 flex h-5.5 w-5.5 items-center justify-center rounded-full bg-red-500 hover:bg-red-650 text-white cursor-pointer transition-all shadow-md hover:scale-105"
+                      >
+                        <RiCloseLine size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
           {/* Step 2: Prompt */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">2. Describe Changes</label>
-            <div className="rounded-2xl border border-slate-250 bg-slate-50/80 p-3 focus-within:bg-white focus-within:border-blue-300 transition-all">
+            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">
+              Describe Changes
+            </label>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3 focus-within:bg-white focus-within:border-blue-300 transition-all">
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -103,13 +288,17 @@ export default function ImageToImagePage() {
           {/* Step 3: Influence Strength */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">3. Image Strength ({Math.round(strength * 100)}%)</label>
-              <span className="text-[10px] font-bold text-slate-400">Low = More creative freedom</span>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Image Strength ({Math.round(strength * 100)}%)
+              </label>
+              <span className="text-[10px] font-bold text-slate-400">
+                Low = More creative freedom
+              </span>
             </div>
             <input
               type="range"
-              min="0.1"
-              max="0.9"
+              min="0.0"
+              max="1.0"
               step="0.05"
               value={strength}
               onChange={(e) => setStrength(parseFloat(e.target.value))}
@@ -117,18 +306,77 @@ export default function ImageToImagePage() {
             />
           </div>
 
+          {/* Step 4: Resolution */}
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">
+              Resolution
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {["normal", "hd", "ultra"].map((res) => (
+                <button
+                  key={res}
+                  type="button"
+                  onClick={() => setQuality(res)}
+                  className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] capitalize ${
+                    quality === res
+                      ? "border-blue-500 bg-blue-50 text-blue-600 shadow-sm font-black"
+                      : "border-slate-200 bg-white text-slate-650 hover:border-slate-350 hover:bg-slate-50"
+                  }`}
+                >
+                  {res === "normal" ? "standard" : res}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Step 5: Number of Images */}
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wide">
+              Number of Images
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[1, 2, 4].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => setNumberOfImages(count)}
+                  className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    numberOfImages === count
+                      ? "border-blue-500 bg-blue-50 text-blue-600 shadow-sm font-black"
+                      : "border-slate-200 bg-white text-slate-650 hover:border-slate-350 hover:bg-slate-50"
+                  }`}
+                >
+                  {count} {count === 1 ? "Image" : "Images"}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex gap-3 pt-3">
             <button
               onClick={handleGenerate}
-              disabled={generating || !sourceImg}
+              disabled={generating || uploadedImages.length === 0}
               className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-500 to-indigo-650 py-3.5 text-xs font-bold text-white shadow-lg shadow-blue-200/50 hover:brightness-115 hover:-translate-y-px transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <RiSparklingFill size={14} />
               {generating ? "Transforming..." : "Generate Variant"}
             </button>
             <button
-              onClick={handleReset}
+              onClick={() => {
+                uploadedImages.forEach((img) =>
+                  URL.revokeObjectURL(img.preview),
+                );
+                setUploadedImages([]);
+                setResultImg("");
+                setPrompt(
+                  "Make the background snowy and add vintage lighting.",
+                );
+                setStrength(0.65);
+                setQuality("normal");
+                setNumberOfImages(1);
+                setDropdownOpen(false);
+              }}
               className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer transition-all shadow-sm"
             >
               <RiRefreshLine size={14} />
@@ -137,49 +385,45 @@ export default function ImageToImagePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Interactive Comparison Preview */}
+        {/* RIGHT COLUMN: Output Preview */}
         <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 md:p-8 shadow-[0_10px_40px_rgba(15,23,42,0.03)] backdrop-blur-xl flex flex-col justify-between min-h-[460px]">
           <div>
-            <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">Before / After Compare</h3>
-            <p className="text-xs text-slate-400 mb-5">Drag slider to compare source vs generated output</p>
+            <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">
+              Output Preview
+            </h3>
+            <p className="text-xs text-slate-400 mb-5">
+              Preview of the transformed output image
+            </p>
           </div>
 
-          <div className="relative flex-1 rounded-2xl overflow-hidden border border-slate-150 shadow-inner bg-slate-50 flex items-center justify-center select-none aspect-video">
+          <div
+            className={`relative w-full rounded-2xl overflow-hidden border border-slate-150 shadow-inner bg-slate-50 flex items-center justify-center select-none transition-all duration-300 ${resultImg ? "aspect-auto h-auto max-h-[500px]" : "aspect-square"}`}
+          >
             {generating ? (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white/70 backdrop-blur-xs">
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white/70 backdrop-blur-xs min-h-[300px]">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                <p className="text-xs font-bold text-slate-500">Transforming layout styles...</p>
+                <p className="text-xs font-bold text-slate-500">
+                  Transforming layout styles...
+                </p>
               </div>
             ) : resultImg ? (
-              // Comparison slider container
-              <div className="relative w-full h-full overflow-hidden" onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                setSliderPos(Math.min(100, Math.max(0, x)));
-              }}>
-                {/* Result Image (Bottom Layer) */}
-                <img src={resultImg} alt="After" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
-
-                {/* Source Image (Top Layer, Width Clipped) */}
-                <div className="absolute inset-y-0 left-0 overflow-hidden pointer-events-none" style={{ width: `${sliderPos}%` }}>
-                  <img src={sourceImg} alt="Before" className="absolute inset-0 w-full h-full object-cover max-w-none" style={{ width: "100%", height: "100%" }} />
-                </div>
-
-                {/* Vertical Divider line */}
-                <div className="absolute inset-y-0 z-10 w-0.5 bg-white shadow pointer-events-none" style={{ left: `${sliderPos}%` }}>
-                  <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-700 shadow-md border border-slate-200">
-                    <RiArrowLeftRightLine size={12} />
-                  </div>
-                </div>
-              </div>
+              <img
+                src={resultImg}
+                alt="Generated Output"
+                className="w-full h-auto object-contain rounded-2xl max-h-[500px]"
+              />
             ) : (
-              <div className="flex flex-col items-center justify-center gap-3 text-center">
+              <div className="flex flex-col items-center justify-center gap-3 text-center p-6">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-450 shadow-inner">
-                  <RiArrowLeftRightLine size={24} />
+                  <RiImageAddLine size={24} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-650">No comparison loaded</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Upload source image and click Generate</p>
+                  <p className="text-xs font-bold text-slate-650">
+                    No output image loaded
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Upload source images and click Generate
+                  </p>
                 </div>
               </div>
             )}

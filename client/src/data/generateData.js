@@ -103,4 +103,27 @@ export const HISTORY = [
   "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=300&fit=crop",
 ];
 
+export const generationCost = {
+  stock: {
+    pexels: {
+      square: { normal: 10, hd: 20, ultra: 50 },
+      portrait: { normal: 10, hd: 20, ultra: 80 },
+      landscape: { normal: 10, hd: 20, ultra: 80 },
+    },
+  },
+
+  flux: {
+    schnell: {
+      square: { normal: 10, hd: 15, ultra: 25 },
+      portrait: { normal: 10, hd: 20, ultra: 35 },
+      landscape: { normal: 10, hd: 20, ultra: 35 },
+    },
+    dev: {
+      square: { normal: 20, hd: 30, ultra: 50 },
+      portrait: { normal: 20, hd: 40, ultra: 70 },
+      landscape: { normal: 20, hd: 40, ultra: 70 },
+    },
+  },
+};
+
 

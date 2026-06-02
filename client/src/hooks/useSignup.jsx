@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthContext } from "../context/auth/AuthContext";
+import { validateForm } from "../utils/authValidation";
 
 const useSignup = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,6 +9,18 @@ const useSignup = () => {
   const { dispatch } = useAuthContext();
 
   const signup = async (formData) => {
+    const validationErrors = validateForm(formData);
+    const errorKeys = Object.keys(validationErrors);
+
+    if (errorKeys.length > 0) {
+      const firstError = validationErrors[errorKeys[0]];
+      setError(firstError);
+      return {
+        success: false,
+        message: firstError,
+      };
+    }
+
     try {
       setIsLoading(true);
 

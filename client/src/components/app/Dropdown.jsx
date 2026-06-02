@@ -4,10 +4,15 @@ import {
   RiArrowDownSLine,
   RiCheckLine,
 } from "react-icons/ri";
+import { useAuthContext } from "../../context/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Dropdown({ selected, options, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef();
+  const navigate = useNavigate();
+  const { user } = useAuthContext();
+  const isFreePlan = !user || user.plan === "free";
   
   const isGrouped = options[0] && Array.isArray(options[0].models);
   const getFlatOptions = () => {
@@ -36,7 +41,7 @@ export default function Dropdown({ selected, options, onChange }) {
         className="flex w-full items-center justify-between rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50/40 hover:shadow-md cursor-pointer"
       >
         <div className="flex items-center gap-2 overflow-hidden">
-          {current?.crown && (
+          {current?.crown && isFreePlan && (
             <RiVipCrownFill size={12} className="shrink-0 text-amber-400" />
           )}
           <span className="truncate">{current?.label}</span>
@@ -67,6 +72,11 @@ export default function Dropdown({ selected, options, onChange }) {
                   <button
                     key={opt.id}
                     onClick={() => {
+                      if (opt.crown && isFreePlan) {
+                        navigate("/app/billing");
+                        setOpen(false);
+                        return;
+                      }
                       onChange(opt.id);
                       setOpen(false);
                     }}
@@ -77,7 +87,7 @@ export default function Dropdown({ selected, options, onChange }) {
                     }`}
                   >
                     <div className="flex items-center gap-2 overflow-hidden">
-                      {opt.crown && (
+                      {opt.crown && isFreePlan && (
                         <RiVipCrownFill size={12} className="text-amber-400" />
                       )}
                       <span>{opt.label}</span>
@@ -100,6 +110,11 @@ export default function Dropdown({ selected, options, onChange }) {
               <button
                 key={opt.id}
                 onClick={() => {
+                  if (opt.crown && isFreePlan) {
+                    navigate("/app/billing");
+                    setOpen(false);
+                    return;
+                  }
                   onChange(opt.id);
                   setOpen(false);
                 }}
@@ -110,7 +125,7 @@ export default function Dropdown({ selected, options, onChange }) {
                 }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  {opt.crown && (
+                  {opt.crown && isFreePlan && (
                     <RiVipCrownFill size={12} className="text-amber-400" />
                   )}
                   <span>{opt.label}</span>

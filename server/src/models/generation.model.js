@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const imageGenerationSchema = new mongoose.Schema(
+const generationSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -10,7 +10,7 @@ const imageGenerationSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["textToImage"],
+      enum: ["textToImage", "imageToImage", "imageUpscaler", "video"],
       default: "textToImage",
       required: true,
     },
@@ -32,14 +32,20 @@ const imageGenerationSchema = new mongoose.Schema(
 
     size: {
       type: String,
-      enum: ["square", "portrait", "landscape"],
-      required: true,
+      enum: ["square", "portrait", "landscape", ""],
+      default: "",
+    },
+
+    style: {
+      type: String,
+      enum: ["realistic", "anime", "3d", "digital", "sketch", ""],
+      default: "",
     },
 
     quality: {
       type: String,
-      enum: ["normal", "hd", "ultra"],
-      default: "normal",
+      enum: ["normal", "hd", "ultra", ""],
+      default: "",
     },
 
     numberOfImages: {
@@ -49,7 +55,7 @@ const imageGenerationSchema = new mongoose.Schema(
       max: 4,
     },
 
-    imageUrls: [
+    inputImageUrls: [
       {
         url: {
           type: String,
@@ -63,6 +69,26 @@ const imageGenerationSchema = new mongoose.Schema(
       },
     ],
 
+    outputImageUrls: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+
+        publicId: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+
+
+    strength: {
+      type: mongoose.Schema.Types.Mixed,
+      default: "",
+    },
+
     creditsUsed: {
       type: Number,
       default: 0,
@@ -73,9 +99,6 @@ const imageGenerationSchema = new mongoose.Schema(
   },
 );
 
-const ImageGeneration = mongoose.model(
-  "ImageGeneration",
-  imageGenerationSchema,
-);
+const Generation = mongoose.model("Generation", generationSchema);
 
-export default ImageGeneration;
+export default Generation;

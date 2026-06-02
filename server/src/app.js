@@ -8,7 +8,7 @@ import { globalLimiter } from "./middlewares/rateLimiter.middleware.js";
 
 //Routers Modules
 import authRoutes from "./routes/user.routes.js";
-import imageGenerationRoutes from "./routes/imageGeneration.routes.js";
+import generationRoutes from "./routes/generation.route.js";
 
 const app = express();
 
@@ -19,13 +19,13 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use("/api", globalLimiter);
 
 // routes
 app.use("/api/auth", authRoutes);
-app.use("/api/text-to-image", imageGenerationRoutes);
+app.use("/api/generation", generationRoutes);
 
 // error handlers
 app.use((req, res, next) => {

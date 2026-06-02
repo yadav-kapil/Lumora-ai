@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../../context/auth/AuthContext";
 
 import {
   RiUser3Line,
@@ -13,9 +14,12 @@ import {
 } from "react-icons/ri";
 
 export default function Profile({ onClose }) {
-  const [username, setUsername] = useState("Kapil Yadav");
-  const [email] = useState("kapil@example.com");
-  const [avatarLetter, setAvatarLetter] = useState("K");
+  const { user } = useAuthContext();
+  const [username, setUsername] = useState(user?.username || "");
+  const [email] = useState(user?.email || "");
+  const [avatarLetter, setAvatarLetter] = useState(
+    user?.username ? user.username.charAt(0).toUpperCase() : "?"
+  );
 
   // Block Background Scrolling
   useEffect(() => {
@@ -142,7 +146,7 @@ export default function Profile({ onClose }) {
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Credits</p>
-                <p className="text-xs font-black text-slate-800 mt-0.5">100 remaining</p>
+                <p className="text-xs font-black text-slate-800 mt-0.5">{user?.credits ?? 0} remaining</p>
               </div>
             </div>
           </div>

@@ -31,6 +31,25 @@ export const authReducer = (state, action) => {
         isLoading: action.payload,
       };
 
+    case "UPDATE_CREDITS":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          credits: action.payload,
+        },
+      };
+
+    case "UPDATE_PLAN":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          plan: action.payload.plan,
+          credits: action.payload.credits,
+        },
+      };
+
     default:
       return state;
   }

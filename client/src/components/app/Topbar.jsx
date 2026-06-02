@@ -13,11 +13,10 @@ import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
-  const [credits] = useState(100);
-  const [avatarLetter] = useState("K");
+  const { user, dispatch } = useAuthContext();
+  const credits = user?.credits ?? 0;
+  const avatarLetter = user?.username ? user.username.charAt(0).toUpperCase() : "?";
   const [showMenu, setShowMenu] = useState(false);
-
-  const { dispatch } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -61,7 +60,10 @@ export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
         {/* RIGHT — Actions */}
         <div className="flex items-center gap-3">
           {/* Credits */}
-          <button className="group flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-2 transition-all duration-200 hover:border-emerald-200 hover:bg-emerald-100/60">
+          <button
+            onClick={() => navigate("/app/billing")}
+            className="group flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-2 transition-all duration-200 hover:border-emerald-200 hover:bg-emerald-100/60"
+          >
             <RiCoinLine size={15} className="text-emerald-600" />
             <span className="text-xs font-semibold text-emerald-700">
               Credits: {credits}
@@ -112,10 +114,10 @@ export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-slate-800">
-                    Kapil Yadav
+                    {user?.username || "Guest"}
                   </p>
                   <p className="truncate text-[10px] text-slate-400">
-                    kapil@example.com
+                    {user?.email || "guest@example.com"}
                   </p>
                 </div>
               </div>

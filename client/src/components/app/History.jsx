@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../../context/app/AppContext";
+import { downloadImage } from "../../utils/downloadHelper";
 
 import {
   RiSearchLine,
@@ -17,144 +19,6 @@ import {
   RiSortDesc,
 } from "react-icons/ri";
 
-const MOCK_HISTORY_ITEMS = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500&q=80",
-    prompt: "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
-    style: "realistic",
-    timeAgo: "2 min ago",
-    premium: true,
-    timestamp: 1,
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
-    prompt: "Scenic alpine lake with high pine trees reflecting on pristine blue water, morning mist.",
-    style: "realistic",
-    timeAgo: "15 min ago",
-    premium: true,
-    timestamp: 2,
-  },
-  {
-    id: 3,
-    url: "https://images.unsplash.com/photo-1515621061946-eff1c2a352bd?w=500&q=80",
-    prompt: "Cyberpunk neon street at night, glowing storefront signs, reflections in rain puddles.",
-    style: "3d",
-    timeAgo: "32 min ago",
-    premium: true,
-    timestamp: 3,
-  },
-  {
-    id: 4,
-    url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80",
-    prompt: "Luxurious modern living room, floor to ceiling glass windows looking at pine trees, midcentury modern furniture.",
-    style: "realistic",
-    timeAgo: "1 hour ago",
-    premium: false,
-    timestamp: 4,
-  },
-  {
-    id: 5,
-    url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&q=80",
-    prompt: "A cinematic portrait of a mysterious woman in warm glowing backlight, volumetric dust.",
-    style: "realistic",
-    timeAgo: "1 hour ago",
-    premium: true,
-    timestamp: 5,
-  },
-  {
-    id: 6,
-    url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
-    prompt: "A cybernetic anime girl with pink neon glowing hair, standing in a futuristic arcade hall.",
-    style: "anime",
-    timeAgo: "2 hours ago",
-    premium: true,
-    timestamp: 6,
-  },
-  {
-    id: 7,
-    url: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&q=80",
-    prompt: "A futuristic city skyline with space elevators and glowing tower bridges under a starry night.",
-    style: "digital",
-    timeAgo: "3 hours ago",
-    premium: true,
-    timestamp: 7,
-  },
-  {
-    id: 8,
-    url: "https://images.unsplash.com/photo-1472214222541-d510753a8707?w=500&q=80",
-    prompt: "Golden hour sunset lighting over grand canyon mountains, orange clouds, cinematic wide shot.",
-    style: "realistic",
-    timeAgo: "5 hours ago",
-    premium: false,
-    timestamp: 8,
-  },
-  {
-    id: 9,
-    url: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0a3?w=500&q=80",
-    prompt: "A vintage yellow automobile parked on a European cobblestone street, sunlight filtering through trees.",
-    style: "realistic",
-    timeAgo: "6 hours ago",
-    premium: true,
-    timestamp: 9,
-  },
-  {
-    id: 10,
-    url: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500&q=80",
-    prompt: "Detailed black and white charcoal sketch of a cozy cabin nestled deeply in the pine forest.",
-    style: "sketch",
-    timeAgo: "9 hours ago",
-    premium: false,
-    timestamp: 10,
-  },
-  {
-    id: 11,
-    url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=500&q=80",
-    prompt: "A warm rustic campsite in a sunny meadow, orange tent, glowing campfire under the morning sun.",
-    style: "realistic",
-    timeAgo: "11 hours ago",
-    premium: true,
-    timestamp: 11,
-  },
-  {
-    id: 12,
-    url: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500&q=80",
-    prompt: "An astronaut standing on the surface of a red desert planet, looking up at two giant rings in the sky.",
-    style: "digital",
-    timeAgo: "12 hours ago",
-    premium: false,
-    timestamp: 12,
-  },
-  {
-    id: 13,
-    url: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80",
-    prompt: "Minimalist ceramic vase on a wooden table, warm sunlight casting sharp shadows on a plain beige wall.",
-    style: "realistic",
-    timeAgo: "Yesterday",
-    premium: false,
-    timestamp: 13,
-  },
-  {
-    id: 14,
-    url: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80",
-    prompt: "An ancient library filled with tall wooden shelves of old books, warm hanging study lamps, dust motes.",
-    style: "realistic",
-    timeAgo: "Yesterday",
-    premium: true,
-    timestamp: 14,
-  },
-  {
-    id: 15,
-    url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&q=80",
-    prompt: "Rainy cyberpunk street view looking down a narrow alley with high cables, passing train tracks, neon lights.",
-    style: "3d",
-    timeAgo: "2 days ago",
-    premium: false,
-    timestamp: 15,
-  },
-];
-
 const ITEMS_PER_PAGE = 10;
 
 const STYLE_OPTIONS = [
@@ -171,7 +35,22 @@ const SORT_OPTIONS = [
   { id: "oldest", label: "Oldest First" },
 ];
 
-export default function History({ onClose }) {
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return "unknown";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Yesterday";
+  return `${diffDays} days ago`;
+};
+
+export default function History({ onClose, onSelect }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -211,14 +90,37 @@ export default function History({ onClose }) {
     };
   }, []);
 
+  const { historyByType } = useAppContext();
+  const dbHistoryItems = [
+    ...(historyByType?.textToImage || []),
+    ...(historyByType?.imageToImage || []),
+    ...(historyByType?.imageUpscaler || []),
+    ...(historyByType?.video || []),
+  ];
+
+  const items = dbHistoryItems.flatMap((item) => {
+    const itemImages = item.outputImageUrls || item.imageUrls || [];
+    return (itemImages && itemImages.length > 0 ? itemImages : []).map((img, index) => ({
+      id: `${item._id}_${index}`,
+      url: img.url,
+      urls: itemImages ? itemImages.map((i) => i.url) : [],
+      prompt: item.prompt || "",
+      style: item.style || "realistic",
+      premium: item.provider && item.provider !== "stock",
+      createdAt: item.createdAt,
+      timestamp: new Date(item.createdAt).getTime(),
+      timeAgo: formatTimeAgo(item.createdAt),
+    }))
+  });
+
   // Filter & Sort Logic
-  const filteredItems = MOCK_HISTORY_ITEMS.filter((item) => {
+  const filteredItems = items.filter((item) => {
     const matchesSearch = item.prompt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStyle = selectedStyle === "all" || item.style === selectedStyle;
     return matchesSearch && matchesStyle;
   }).sort((a, b) => {
-    if (sortOrder === "newest") return a.timestamp - b.timestamp;
-    return b.timestamp - a.timestamp;
+    if (sortOrder === "newest") return b.timestamp - a.timestamp;
+    return a.timestamp - b.timestamp;
   });
 
   // Calculate Pagination values
@@ -427,11 +329,14 @@ export default function History({ onClose }) {
               </div>
             </div>
           ) : viewType === "grid" ? (
-            /* Grid View */
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-1">
               {paginatedItems.map((item) => (
                 <div
                   key={item.id}
+                  onClick={() => {
+                    if (onSelect) onSelect(item.urls, item.url);
+                    onClose();
+                  }}
                   className="group relative aspect-square overflow-hidden rounded-[20px] border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,23,42,0.12)] hover:border-slate-300 cursor-pointer"
                 >
                   <img
@@ -457,14 +362,15 @@ export default function History({ onClose }) {
                   </div>
 
                   {/* Download hover button */}
-                  <a
-                    href={item.url}
-                    download={`generation-${item.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white opacity-0 shadow-md translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-emerald-500 hover:text-white"
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadImage(item.url, `lumora-generation-${item.id}.jpg`);
+                    }}
+                    className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white opacity-0 shadow-md translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-emerald-500 hover:text-white cursor-pointer"
                   >
-                    <RiDownloadLine size={14} className="text-slate-800 hover:text-inherit" />
-                  </a>
+                    <RiDownloadLine size={14} className="text-slate-805 hover:text-white" />
+                  </button>
 
                   {/* Floating tooltip prompt description */}
                   <div className="absolute inset-x-0 top-0 p-3 bg-gradient-to-b from-black/75 to-transparent text-[11px] font-semibold text-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none line-clamp-2">
@@ -479,6 +385,10 @@ export default function History({ onClose }) {
               {paginatedItems.map((item) => (
                 <div
                   key={item.id}
+                  onClick={() => {
+                    if (onSelect) onSelect(item.urls, item.url);
+                    onClose();
+                  }}
                   className="flex items-center gap-4 p-3 rounded-2xl border border-slate-150 bg-white hover:bg-slate-50/40 transition-all hover:border-slate-300 cursor-pointer shadow-[0_2px_8px_rgba(15,23,42,0.02)]"
                 >
                   <img
@@ -503,14 +413,15 @@ export default function History({ onClose }) {
                       <RiVipCrownFill size={13} />
                     </div>
                   )}
-                  <a
-                    href={item.url}
-                    download={`generation-${item.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-250 bg-white hover:border-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm hover:scale-105 active:scale-95"
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadImage(item.url, `lumora-generation-${item.id}.jpg`);
+                    }}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-250 bg-white hover:border-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
                   >
-                    <RiDownloadLine size={14} className="text-slate-600 hover:text-inherit" />
-                  </a>
+                    <RiDownloadLine size={14} className="text-slate-600 hover:text-white" />
+                  </button>
                 </div>
               ))}
             </div>

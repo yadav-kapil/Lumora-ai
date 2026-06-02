@@ -13,99 +13,8 @@ import {
   RiFilter3Line,
   RiSortDesc,
 } from "react-icons/ri";
-
-const MOCK_HISTORY_ITEMS = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500&q=80",
-    prompt: "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
-    style: "realistic",
-    timeAgo: "2 min ago",
-    premium: true,
-    timestamp: 1,
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
-    prompt: "Scenic alpine lake with high pine trees reflecting on pristine blue water, morning mist.",
-    style: "realistic",
-    timeAgo: "15 min ago",
-    premium: true,
-    timestamp: 2,
-  },
-  {
-    id: 3,
-    url: "https://images.unsplash.com/photo-1515621061946-eff1c2a352bd?w=500&q=80",
-    prompt: "Cyberpunk neon street at night, glowing storefront signs, reflections in rain puddles.",
-    style: "3d",
-    timeAgo: "32 min ago",
-    premium: true,
-    timestamp: 3,
-  },
-  {
-    id: 4,
-    url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80",
-    prompt: "Luxurious modern living room, floor to ceiling glass windows looking at pine trees, midcentury modern furniture.",
-    style: "realistic",
-    timeAgo: "1 hour ago",
-    premium: false,
-    timestamp: 4,
-  },
-  {
-    id: 5,
-    url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&q=80",
-    prompt: "A cinematic portrait of a mysterious woman in warm glowing backlight, volumetric dust.",
-    style: "realistic",
-    timeAgo: "1 hour ago",
-    premium: true,
-    timestamp: 5,
-  },
-  {
-    id: 6,
-    url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
-    prompt: "A cybernetic anime girl with pink neon glowing hair, standing in a futuristic arcade hall.",
-    style: "anime",
-    timeAgo: "2 hours ago",
-    premium: true,
-    timestamp: 6,
-  },
-  {
-    id: 7,
-    url: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&q=80",
-    prompt: "A futuristic city skyline with space elevators and glowing tower bridges under a starry night.",
-    style: "digital",
-    timeAgo: "3 hours ago",
-    premium: true,
-    timestamp: 7,
-  },
-  {
-    id: 8,
-    url: "https://images.unsplash.com/photo-1472214222541-d510753a8707?w=500&q=80",
-    prompt: "Golden hour sunset lighting over grand canyon mountains, orange clouds, cinematic wide shot.",
-    style: "realistic",
-    timeAgo: "5 hours ago",
-    premium: false,
-    timestamp: 8,
-  },
-  {
-    id: 9,
-    url: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0a3?w=500&q=80",
-    prompt: "A vintage yellow automobile parked on a European cobblestone street, sunlight filtering through trees.",
-    style: "realistic",
-    timeAgo: "6 hours ago",
-    premium: true,
-    timestamp: 9,
-  },
-  {
-    id: 10,
-    url: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500&q=80",
-    prompt: "Detailed black and white charcoal sketch of a cozy cabin nestled deeply in the pine forest.",
-    style: "sketch",
-    timeAgo: "9 hours ago",
-    premium: false,
-    timestamp: 10,
-  },
-];
+import { useAppContext } from "../../context/app/AppContext";
+import { downloadImage } from "../../utils/downloadHelper";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -123,7 +32,23 @@ const SORT_OPTIONS = [
   { id: "oldest", label: "Oldest First" },
 ];
 
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return "unknown";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Yesterday";
+  return `${diffDays} days ago`;
+};
+
 export default function HistoryPage() {
+  const { historyByType } = useAppContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -149,13 +74,36 @@ export default function HistoryPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredItems = MOCK_HISTORY_ITEMS.filter((item) => {
+  // Combine and format real history items
+  const dbHistoryItems = [
+    ...(historyByType?.textToImage || []),
+    ...(historyByType?.imageToImage || []),
+    ...(historyByType?.imageUpscaler || []),
+    ...(historyByType?.video || []),
+  ];
+
+  const items = dbHistoryItems.flatMap((item) => {
+    const itemImages = item.outputImageUrls || item.imageUrls || [];
+    return (itemImages && itemImages.length > 0 ? itemImages : []).map((img, index) => ({
+      id: `${item._id}_${index}`,
+      url: img.url,
+      urls: itemImages ? itemImages.map((i) => i.url) : [],
+      prompt: item.prompt || "",
+      style: item.style || "realistic",
+      premium: item.provider && item.provider !== "stock",
+      createdAt: item.createdAt,
+      timestamp: new Date(item.createdAt).getTime(),
+      timeAgo: formatTimeAgo(item.createdAt),
+    }));
+  });
+
+  const filteredItems = items.filter((item) => {
     const matchesSearch = item.prompt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStyle = selectedStyle === "all" || item.style === selectedStyle;
     return matchesSearch && matchesStyle;
   }).sort((a, b) => {
-    if (sortOrder === "newest") return a.timestamp - b.timestamp;
-    return b.timestamp - a.timestamp;
+    if (sortOrder === "newest") return b.timestamp - a.timestamp;
+    return a.timestamp - b.timestamp;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -175,6 +123,7 @@ export default function HistoryPage() {
 
   const activeStyleLabel = STYLE_OPTIONS.find((s) => s.id === selectedStyle)?.label || "All Styles";
   const activeSortLabel = SORT_OPTIONS.find((s) => s.id === sortOrder)?.label || "Newest First";
+
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -307,9 +256,15 @@ export default function HistoryPage() {
                     <RiTimeLine size={10} />
                     <span>{item.timeAgo}</span>
                   </div>
-                  <a href={item.url} download className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white opacity-0 group-hover:opacity-100 hover:bg-emerald-500 hover:text-white transition-all shadow">
-                    <RiDownloadLine size={14} className="text-slate-800 hover:text-inherit" />
-                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadImage(item.url, `lumora-generation-${item.id}.jpg`);
+                    }}
+                    className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white opacity-0 group-hover:opacity-100 hover:bg-emerald-500 hover:text-white transition-all shadow cursor-pointer"
+                  >
+                    <RiDownloadLine size={14} className="text-slate-805 hover:text-white" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -322,9 +277,15 @@ export default function HistoryPage() {
                     <p className="text-sm font-bold text-slate-800 truncate">{item.prompt}</p>
                     <span className="text-xs text-slate-400 mt-1.5 block">{item.timeAgo}</span>
                   </div>
-                  <a href={item.url} download className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-250 bg-white hover:bg-emerald-500 hover:text-white transition-all">
-                    <RiDownloadLine size={14} className="text-slate-650 hover:text-inherit" />
-                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadImage(item.url, `lumora-generation-${item.id}.jpg`);
+                    }}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-250 bg-white hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
+                  >
+                    <RiDownloadLine size={14} className="text-slate-600 hover:text-white" />
+                  </button>
                 </div>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   RiSparklingFill,
   RiVipCrownFill,
@@ -9,6 +9,7 @@ import {
   RiHistoryLine,
   RiImageAddLine,
   RiDeleteBin6Line,
+  RiCoinLine,
 } from "react-icons/ri";
 import {
   STYLES,
@@ -16,15 +17,22 @@ import {
   MODELS,
   RESOLUTIONS,
   IMAGE_COUNTS,
+  generationCost,
 } from "../../data/generateData";
 import History from "../../components/app/History";
 import Dropdown from "../../components/app/Dropdown";
 import useTextToImage from "../../hooks/useTextToImage";
 import { useAppContext } from "../../context/app/AppContext";
+import { useAuthContext } from "../../context/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
+import LoadingHistory from "../../components/app/LoadingHistory";
+import { useToast } from "../../context/ToastContext";
+import { downloadImage } from "../../utils/downloadHelper";
 
 export default function GeneratePage() {
   const [promptObj, setPromptObj] = useState({
-    prompt: "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
+    prompt:
+      "A cozy workspace with warm sunlight, laptop, plants, and minimal desk setup.",
     style: "realistic",
     size: "landscape",
     model: "pexels",
@@ -35,16 +43,40 @@ export default function GeneratePage() {
 
   const [showHistory, setShowHistory] = useState(false);
   const [previewImg, setPreviewImg] = useState("");
+  const [previewImgs, setPreviewImgs] = useState([]);
 
-  const { generateImage, isLoading, error } = useTextToImage();
-  const { historyByType } = useAppContext();
-  
+  const { user } = useAuthContext();
+  const isFreePlan = !user || user.plan === "free";
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  const { generateImage, isLoading, error, setError } = useTextToImage();
+
+  useEffect(() => {
+    if (error) {
+      showToast(error, "error", "Generation Failed");
+      setError("");
+    }
+  }, [error, showToast, setError]);
+  const { historyByType, isLoading: isHistoryLoading } = useAppContext();
+
+  const providerCost =
+    generationCost[promptObj.provider]?.[promptObj.model]?.[promptObj.size]?.[
+      promptObj.quality
+    ] || 0;
+  const currentCost = providerCost * promptObj.numberOfImages;
+
+  if (isHistoryLoading) {
+    return <LoadingHistory />;
+  }
+
   const ratio = SIZES.find((s) => s.id === promptObj.size) || SIZES[0];
 
   const textToImageHistory = historyByType.textToImage;
 
   const handleClear = () => {
     setPreviewImg("");
+    setPreviewImgs([]);
   };
 
   const handleReset = () => {
@@ -58,32 +90,35 @@ export default function GeneratePage() {
       numberOfImages: 1,
     });
     setPreviewImg("");
+    setPreviewImgs([]);
   };
 
   const handleModelChange = (modelId) => {
     const group = MODELS.find((g) => g.models.some((m) => m.id === modelId));
     const provider = group ? group.provider : "stock";
-    setPromptObj((prev) => ({ ...prev, model: modelId, provider }));
+    setPromptObj((prev) => ({
+      ...prev,
+      model: modelId,
+      provider,
+      ...(provider === "stock" ? { quality: "normal" } : {}),
+    }));
   };
 
   const handleGenerate = async () => {
-    if (!promptObj.prompt.trim()) return;
     const result = await generateImage(promptObj);
     if (result && result.success) {
       const historyItem = result.data.historyItem;
-      if (historyItem.imageUrls.length > 0) {
-        setPreviewImg(historyItem.imageUrls[0].url);
+      const images = historyItem.outputImageUrls || historyItem.imageUrls || [];
+      if (images.length > 0) {
+        const urls = images.map((img) => img.url);
+        setPreviewImgs(urls);
+        setPreviewImg(urls[0]);
       }
     }
   };
 
   return (
     <div className="grid grid-cols-1 gap-5 bg-slate-50/70 p-3 sm:p-5 lg:grid-cols-2 lg:gap-6 lg:p-6">
-      {error && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 lg:col-span-2">
-          {error}
-        </div>
-      )}
 
       {/* ───────── LEFT ───────── */}
       <div className="flex flex-col gap-7 rounded-[28px] border border-slate-200/70 bg-white/95 p-7 shadow-[0_10px_40px_rgba(15,23,42,0.04)] backdrop-blur-xl">
@@ -112,7 +147,9 @@ export default function GeneratePage() {
           <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 transition-all focus-within:border-emerald-300 focus-within:bg-white focus-within:shadow-sm">
             <textarea
               value={promptObj.prompt}
-              onChange={(e) => setPromptObj((prev) => ({ ...prev, prompt: e.target.value }))}
+              onChange={(e) =>
+                setPromptObj((prev) => ({ ...prev, prompt: e.target.value }))
+              }
               maxLength={1000}
               rows={4}
               placeholder="Describe your image…"
@@ -125,12 +162,21 @@ export default function GeneratePage() {
               </span>
 
               <div className="relative">
-                <RiVipCrownFill
-                  size={13}
-                  className="absolute -top-2 -left-1.5 z-10 -rotate-[28deg] text-amber-400 drop-shadow-sm"
-                />
+                {isFreePlan && (
+                  <RiVipCrownFill
+                    size={13}
+                    className="absolute -top-2 -left-1.5 z-10 -rotate-[28deg] text-amber-400 drop-shadow-sm"
+                  />
+                )}
 
-                <button className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-emerald-300/40 transition-all hover:-translate-y-px hover:brightness-110 cursor-pointer">
+                <button
+                  onClick={() => {
+                    if (isFreePlan) {
+                      showToast("This is a premium feature, upgrade to Pro", "alert", "Premium Feature");
+                    }
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-emerald-300/40 transition-all hover:-translate-y-px hover:brightness-110 cursor-pointer"
+                >
                   <RiSparklingFill size={12} />
                   Enhance Prompt
                 </button>
@@ -149,14 +195,20 @@ export default function GeneratePage() {
             {STYLES.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setPromptObj((prev) => ({ ...prev, style: s.id }))}
+                onClick={() => {
+                  if (s.premium && isFreePlan) {
+                    showToast("This is a premium feature, upgrade to Pro", "alert", "Premium Feature");
+                    return;
+                  }
+                  setPromptObj((prev) => ({ ...prev, style: s.id }));
+                }}
                 className={`group relative shrink-0 overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
                   promptObj.style === s.id
                     ? "border-emerald-500 bg-white shadow-lg shadow-emerald-100"
                     : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 }`}
               >
-                {s.premium && (
+                {s.premium && isFreePlan && (
                   <RiVipCrownFill
                     size={11}
                     className="absolute top-1.5 left-1.5 z-10 -rotate-[25deg] text-amber-400 drop-shadow-sm"
@@ -204,7 +256,9 @@ export default function GeneratePage() {
               return (
                 <button
                   key={sz.id}
-                  onClick={() => setPromptObj((prev) => ({ ...prev, size: sz.id }))}
+                  onClick={() =>
+                    setPromptObj((prev) => ({ ...prev, size: sz.id }))
+                  }
                   className={`flex flex-col items-center gap-1 rounded-2xl border-2 px-2 py-3 transition-all duration-200 cursor-pointer ${
                     promptObj.size === sz.id
                       ? "border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100"
@@ -214,13 +268,17 @@ export default function GeneratePage() {
                   <Icon
                     size={22}
                     className={`transition-colors ${
-                      promptObj.size === sz.id ? "text-emerald-500" : "text-slate-400"
+                      promptObj.size === sz.id
+                        ? "text-emerald-500"
+                        : "text-slate-400"
                     }`}
                   />
 
                   <span
                     className={`text-[11px] font-semibold ${
-                      promptObj.size === sz.id ? "text-emerald-600" : "text-slate-700"
+                      promptObj.size === sz.id
+                        ? "text-emerald-600"
+                        : "text-slate-700"
                     }`}
                   >
                     {sz.label}
@@ -237,7 +295,11 @@ export default function GeneratePage() {
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
             Model
           </p>
-          <Dropdown selected={promptObj.model} options={MODELS} onChange={handleModelChange} />
+          <Dropdown
+            selected={promptObj.model}
+            options={MODELS}
+            onChange={handleModelChange}
+          />
         </div>
 
         {/* Number of Images + Resolution */}
@@ -249,7 +311,9 @@ export default function GeneratePage() {
             <Dropdown
               selected={promptObj.numberOfImages}
               options={IMAGE_COUNTS}
-              onChange={(val) => setPromptObj((prev) => ({ ...prev, numberOfImages: val }))}
+              onChange={(val) =>
+                setPromptObj((prev) => ({ ...prev, numberOfImages: val }))
+              }
             />
           </div>
 
@@ -259,26 +323,67 @@ export default function GeneratePage() {
             </p>
 
             <div className="flex gap-2">
-              {RESOLUTIONS.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => setPromptObj((prev) => ({ ...prev, quality: r.id }))}
-                  className={`relative flex flex-1 items-center justify-center rounded-2xl border-2 py-3 text-xs font-semibold transition-all cursor-pointer ${
-                    promptObj.quality === r.id
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
-                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-                  }`}
-                >
-                  {r.crown && (
-                    <RiVipCrownFill
-                      size={11}
-                      className="absolute -top-1.5 -left-1.5 -rotate-[25deg] text-amber-400"
-                    />
-                  )}
-                  {r.label}
-                </button>
-              ))}
+              {RESOLUTIONS.map((r) => {
+                const isStock = promptObj.provider === "stock";
+                const isDisabled =
+                  isStock && (r.id === "hd" || r.id === "ultra");
+
+                return (
+                  <button
+                    key={r.id}
+                    disabled={isDisabled}
+                    onClick={() => {
+                      if (r.crown && isFreePlan) {
+                        showToast("This is a premium feature, upgrade to Pro", "alert", "Premium Feature");
+                        return;
+                      }
+                      setPromptObj((prev) => ({ ...prev, quality: r.id }));
+                    }}
+                    className={`relative flex flex-1 items-center justify-center rounded-2xl border-2 py-3 text-xs font-semibold transition-all cursor-pointer ${
+                      promptObj.quality === r.id
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                    } ${
+                      isDisabled
+                        ? "opacity-40 cursor-not-allowed pointer-events-none"
+                        : ""
+                    }`}
+                  >
+                    {r.crown && isFreePlan && (
+                      <RiVipCrownFill
+                        size={11}
+                        className={`absolute -top-1.5 -left-1.5 -rotate-[25deg] ${
+                          isDisabled ? "text-slate-300" : "text-amber-400"
+                        }`}
+                      />
+                    )}
+                    {r.label}
+                  </button>
+                );
+              })}
             </div>
+          </div>
+        </div>
+
+        {/* Cost Indicator Banner */}
+        <div className="flex items-center justify-between rounded-2xl bg-slate-50 border border-slate-200/50 p-4 shadow-sm shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 border border-emerald-100/50">
+              <RiCoinLine size={18} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-800">
+                Credits Required
+              </p>
+              <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                Based on model selection and resolution
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-250/30 rounded-xl px-3.5 py-1.5 shadow-sm">
+              {currentCost} Credits
+            </span>
           </div>
         </div>
 
@@ -373,6 +478,29 @@ export default function GeneratePage() {
             </div>
           </div>
 
+          {/* Thumbnails Navigation for Multiple Images */}
+          {previewImgs.length > 1 && (
+            <div className="mt-4 flex justify-center gap-2 flex-wrap">
+              {previewImgs.map((url, idx) => (
+                <button
+                  key={url || idx}
+                  onClick={() => setPreviewImg(url)}
+                  className={`h-11 w-11 overflow-hidden rounded-xl border-2 transition-all cursor-pointer ${
+                    previewImg === url
+                      ? "border-emerald-500 scale-105 shadow-md shadow-emerald-100"
+                      : "border-slate-200/80 opacity-70 hover:opacity-100 hover:border-slate-350"
+                  }`}
+                >
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Action Row - 3 Buttons matching the mockup */}
           <div className="mt-5 flex gap-3">
             <button
@@ -395,11 +523,12 @@ export default function GeneratePage() {
 
             <button
               disabled={!previewImg}
+              onClick={() => downloadImage(previewImg, "lumora-preview.jpg")}
               className="relative flex-[1.8] flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 py-3.5 text-xs font-bold text-white shadow-xl shadow-emerald-300/40 transition-all hover:-translate-y-px hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <div className="absolute inset-0 -translate-x-full animate-[shimmer_2.4s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <RiDownloadLine size={14} />
-              Download
+              <span className="max-md:hidden">Download</span>
             </button>
           </div>
         </div>
@@ -439,30 +568,57 @@ export default function GeneratePage() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {textToImageHistory.slice(0, 5).map((item, i) => {
+                const itemImages = item.outputImageUrls || item.imageUrls || [];
+                const firstImageUrl = itemImages[0]?.url || "";
                 return (
-                <button
-                  key={item._id || i}
-                  onClick={() => setPreviewImg(item.imageUrls[0].url)}
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg cursor-pointer"
-                >
-                  <img
-                    src={item.imageUrls[0].url}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <div className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-xl bg-white/95 opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100">
-                    <RiDownloadLine size={13} className="text-slate-700" />
-                  </div>
-                </button>
-              );
+                  <button
+                    key={item._id || i}
+                    onClick={() => {
+                      const urls = itemImages.map((img) => img.url);
+                      setPreviewImgs(urls);
+                      setPreviewImg(urls[0]);
+                      setPromptObj({ ...promptObj, prompt: "" });
+                    }}
+                    className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg cursor-pointer"
+                  >
+                    <img
+                      src={firstImageUrl}
+                      alt=""
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadImage(
+                          firstImageUrl,
+                          `lumora-generation-${item._id}.jpg`,
+                        );
+                      }}
+                      className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-xl bg-white/95 opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100 hover:bg-emerald-500 hover:text-white"
+                    >
+                      <RiDownloadLine
+                        size={13}
+                        className="text-slate-700 hover:text-inherit"
+                      />
+                    </div>
+                  </button>
+                );
               })}
             </div>
           )}
         </div>
       </div>
 
-      {showHistory && <History onClose={() => setShowHistory(false)} />}
+      {showHistory && (
+        <History
+          onClose={() => setShowHistory(false)}
+          onSelect={(urls, selectedUrl) => {
+            setPreviewImgs(urls);
+            setPreviewImg(selectedUrl || (urls.length > 0 ? urls[0] : ""));
+          }}
+        />
+      )}
 
       <style>{`
         @keyframes shimmer {
