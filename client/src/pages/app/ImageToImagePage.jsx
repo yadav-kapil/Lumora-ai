@@ -8,6 +8,7 @@ import {
   RiArrowDownSLine,
   RiVipCrownFill,
   RiDeleteBin6Line,
+  RiHistoryLine,
 } from "react-icons/ri";
 import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,9 @@ import { MODELS } from "../../data/imageToImageData";
 import { useToast } from "../../context/ToastContext";
 import useImageToImage from "../../hooks/useImageToImage";
 import { downloadImage } from "../../utils/downloadHelper";
+import { useAppContext } from "../../context/app/AppContext";
+import LoadingHistory from "../../components/app/LoadingHistory";
+import ImageToImageHistory from "../../components/app/ImageToImageHistory";
 
 export default function ImageToImagePage() {
   const { user } = useAuthContext();
@@ -29,6 +33,9 @@ export default function ImageToImagePage() {
     setError,
   } = useImageToImage();
 
+  const { historyByType, isLoading: isHistoryLoading } = useAppContext();
+  const [showHistory, setShowHistory] = useState(false);
+
   const [uploadedImages, setUploadedImages] = useState([]); // Array of { id, file, preview }
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -36,8 +43,8 @@ export default function ImageToImagePage() {
     "Make the background snowy and add vintage lighting.",
   );
   const [strength, setStrength] = useState(0.65);
-  const [resultImg, setResultImg] = useState("https://res.cloudinary.com/dlwwiurn1/image/upload/v1780417466/lumora-ai/text-to-image/sv20fmv4ncwaq54dia27.jpg");
-  const [resultImgs, setResultImgs] = useState(["https://res.cloudinary.com/dlwwiurn1/image/upload/v1780417466/lumora-ai/text-to-image/sv20fmv4ncwaq54dia27.jpg", "https://res.cloudinary.com/dlwwiurn1/image/upload/v1780426170/lumora-ai/text-to-image/cpgwmutdvf2icsfn14xr.jpg", "https://res.cloudinary.com/dlwwiurn1/image/upload/v1780464330/lumora-ai/text-to-image/t0y3ktmfq0kvtmsdyiyg.jpg"]);
+  const [resultImg, setResultImg] = useState("");
+  const [resultImgs, setResultImgs] = useState([]);
   const [quality, setQuality] = useState("normal");
   const [numberOfImages, setNumberOfImages] = useState(1);
   const fileInputRef = useRef(null);
@@ -48,6 +55,12 @@ export default function ImageToImagePage() {
       setError("");
     }
   }, [error, showToast, setError]);
+
+  if (isHistoryLoading) {
+    return <LoadingHistory />;
+  }
+
+  const imageToImageHistory = historyByType?.imageToImage || [];
 
   const handleGenerate = async () => {
     if (isFreePlan) {
@@ -381,102 +394,180 @@ export default function ImageToImagePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Output Preview */}
-        <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 md:p-8 shadow-[0_10px_40px_rgba(15,23,42,0.03)] backdrop-blur-xl flex flex-col gap-5">
-          <div>
-            <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">
-              Output Preview
-            </h3>
-            <p className="text-xs text-slate-400 mb-5">
-              Preview of the transformed output image
-            </p>
-          </div>
+        {/* RIGHT COLUMN: Output Preview & History */}
+        <div className="flex flex-col gap-6">
+          {/* Preview Card */}
+          <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 md:p-8 shadow-[0_10px_40px_rgba(15,23,42,0.03)] backdrop-blur-xl flex flex-col gap-5">
+            <div>
+              <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">
+                Output Preview
+              </h3>
+              <p className="text-xs text-slate-400 mb-5">
+                Preview of the transformed output image
+              </p>
+            </div>
 
-          <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-5 select-none transition-all duration-300">
-            {generating ? (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white/70 backdrop-blur-xs rounded-3xl">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                <p className="text-xs font-semibold text-slate-550">
-                  Generating variant...
-                </p>
-              </div>
-            ) : resultImg ? (
-              <div className="relative max-h-full max-w-full overflow-hidden rounded-[24px] border border-slate-200/80 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-all duration-300 flex items-center justify-center animate-fade-in">
-                <img
-                  src={resultImg}
-                  alt="Generated Output"
-                  className="max-h-[380px] w-auto max-w-full object-contain rounded-[24px]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
-                  <RiSparklingFill size={10} className="text-blue-400" />
-                  <span className="text-[10px] font-semibold tracking-wide text-white">
-                    AI GENERATED
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-3 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100/80 shadow-inner">
-                  <RiImageAddLine size={28} className="text-slate-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-650">
-                    No output image loaded
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Upload source images and click Generate
+            <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-5 select-none transition-all duration-300">
+              {generating ? (
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white/70 backdrop-blur-xs rounded-3xl">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                  <p className="text-xs font-semibold text-slate-555">
+                    Generating variant...
                   </p>
                 </div>
+              ) : resultImg ? (
+                <div className="relative max-h-full max-w-full overflow-hidden rounded-[24px] border border-slate-200/80 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-all duration-300 flex items-center justify-center animate-fade-in">
+                  <img
+                    src={resultImg}
+                    alt="Generated Output"
+                    className="max-h-[380px] w-auto max-w-full object-contain rounded-[24px]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
+                    <RiSparklingFill size={10} className="text-blue-400" />
+                    <span className="text-[10px] font-semibold tracking-wide text-white">
+                      AI GENERATED
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-3 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100/80 shadow-inner">
+                    <RiImageAddLine size={28} className="text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-650">
+                      No output image loaded
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Upload source images and click Generate
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnails Navigation for Multiple Images */}
+            {resultImgs.length > 1 && (
+              <div className="mt-4 flex justify-center gap-2 flex-wrap">
+                {resultImgs.map((url, idx) => (
+                  <button
+                    key={url || idx}
+                    onClick={() => setResultImg(url)}
+                    className={`h-11 w-11 overflow-hidden rounded-xl border-2 transition-all cursor-pointer ${
+                      resultImg === url
+                        ? "border-blue-500 scale-105 shadow-md shadow-blue-100"
+                        : "border-slate-200/80 opacity-70 hover:opacity-100 hover:border-slate-350"
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             )}
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => {
+                  setResultImg("");
+                  setResultImgs([]);
+                }}
+                disabled={!resultImg}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-xs font-semibold text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
+              >
+                <RiDeleteBin6Line size={14} />
+                Clear
+              </button>
+              <button
+                disabled={!resultImg}
+                onClick={() =>
+                  downloadImage(resultImg, "lumora-image-to-image.jpg")
+                }
+                className="flex-[2] flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 py-3.5 text-xs font-bold text-white shadow shadow-blue-200/50 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
+              >
+                <RiDownloadLine size={14} />
+                Download Result
+              </button>
+            </div>
           </div>
 
-          {/* Thumbnails Navigation for Multiple Images */}
-          {resultImgs.length > 1 && (
-            <div className="mt-4 flex justify-center gap-2 flex-wrap">
-              {resultImgs.map((url, idx) => (
-                <button
-                  key={url || idx}
-                  onClick={() => setResultImg(url)}
-                  className={`h-11 w-11 overflow-hidden rounded-xl border-2 transition-all cursor-pointer ${
-                    resultImg === url
-                      ? "border-blue-500 scale-105 shadow-md shadow-blue-100"
-                      : "border-slate-200/80 opacity-70 hover:opacity-100 hover:border-slate-350"
-                  }`}
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+          {/* History Card */}
+          <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-[17px] font-bold tracking-tight text-slate-900">
+                  History
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Your recently generated images
+                </p>
+              </div>
 
-          <div className="mt-6 flex gap-3">
-            <button
-              onClick={() => {
-                setResultImg("");
-                setResultImgs([]);
-              }}
-              disabled={!resultImg}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-xs font-semibold text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
-            >
-              <RiDeleteBin6Line size={14} />
-              Clear
-            </button>
-            <button
-              disabled={!resultImg}
-              onClick={() =>
-                downloadImage(resultImg, "lumora-image-to-image.jpg")
-              }
-              className="flex-[2] flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 py-3.5 text-xs font-bold text-white shadow shadow-blue-200/50 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
-            >
-              <RiDownloadLine size={14} />
-              Download Result
-            </button>
+              <button
+                onClick={() => setShowHistory(true)}
+                className="text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 cursor-pointer"
+              >
+                View All
+              </button>
+            </div>
+
+            {imageToImageHistory.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-100">
+                  <RiHistoryLine size={24} className="text-slate-400" />
+                </div>
+                <p className="text-sm font-semibold text-slate-500">
+                  No images generated yet
+                </p>
+                <p className="text-xs text-slate-400">
+                  Your generated images will appear here
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {imageToImageHistory.slice(0, 5).map((item, i) => {
+                  const itemImages = item.outputImageUrls || item.imageUrls || [];
+                  const firstImageUrl = itemImages[0]?.url || "";
+                  return (
+                    <button
+                      key={item._id || i}
+                      onClick={() => {
+                        const urls = itemImages.map((img) => img.url);
+                        setResultImgs(urls);
+                        setResultImg(urls[0]);
+                      }}
+                      className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg cursor-pointer"
+                    >
+                      <img
+                        src={firstImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadImage(
+                            firstImageUrl,
+                            `lumora-generation-${item._id}.jpg`,
+                          );
+                        }}
+                        className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-xl bg-white/95 opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100 hover:bg-blue-500 hover:text-white"
+                      >
+                        <RiDownloadLine
+                          size={13}
+                          className="text-slate-700 hover:text-inherit"
+                        />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -490,6 +581,15 @@ export default function ImageToImagePage() {
           to { opacity: 1; transform: scale(1); }
         }
       `}</style>
+      {showHistory && (
+        <ImageToImageHistory
+          onClose={() => setShowHistory(false)}
+          onSelect={(urls, selectedUrl) => {
+            setResultImgs(urls);
+            setResultImg(selectedUrl || (urls.length > 0 ? urls[0] : ""));
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -201,3 +201,9 @@ export const generateImageToImage = wrapAsync(async (req, res) => {
     },
   });
 });
+
+
+// Image Upscale 
+export const imageUpscale = wrapAsync(async (req, res) => {
+  throw new Error("Waiting ...")
+})

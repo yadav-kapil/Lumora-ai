@@ -85,8 +85,13 @@ const generationSchema = new mongoose.Schema(
 
 
     strength: {
-      type: mongoose.Schema.Types.Mixed,
-      default: "",
+      type: Number,
+      default: 0,
+    },
+
+    target_resolution: {
+      type: Number,
+      default: 0,
     },
 
     creditsUsed: {

@@ -18,6 +18,12 @@ router.post(
   upload.array("inputImages", 14),
   generateImageToImage,
 );
+router.post(
+  "/upscale",
+  authenticate,
+  upload.single("inputImage", 1),
+  generateImageToImage,
+);
 router.get("/history", authenticate, getHistory);
 router.post("/enhance", authenticate, enhancePrompt);
 

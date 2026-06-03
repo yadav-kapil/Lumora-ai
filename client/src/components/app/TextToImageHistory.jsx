@@ -50,7 +50,7 @@ const formatTimeAgo = (dateString) => {
   return `${diffDays} days ago`;
 };
 
-export default function History({ onClose, onSelect }) {
+export default function TextToImageHistory({ onClose, onSelect }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -91,12 +91,7 @@ export default function History({ onClose, onSelect }) {
   }, []);
 
   const { historyByType } = useAppContext();
-  const dbHistoryItems = [
-    ...(historyByType?.textToImage || []),
-    ...(historyByType?.imageToImage || []),
-    ...(historyByType?.imageUpscaler || []),
-    ...(historyByType?.video || []),
-  ];
+  const dbHistoryItems = historyByType?.textToImage || [];
 
   const items = dbHistoryItems.flatMap((item) => {
     const itemImages = item.outputImageUrls || item.imageUrls || [];
@@ -159,7 +154,7 @@ export default function History({ onClose, onSelect }) {
             </div>
             <div>
               <h2 className="text-[20px] font-black text-slate-900 tracking-tight leading-none">
-                Generation History
+                Text to Image History
               </h2>
               <p className="mt-1.5 text-xs font-semibold text-slate-400">
                 Your recently generated images
@@ -291,7 +286,7 @@ export default function History({ onClose, onSelect }) {
             )}
           </div>
 
-          {/* Layout switcher switcher */}
+          {/* Layout switcher */}
           <div className="flex items-center gap-1 bg-slate-100 rounded-2xl p-1 border border-slate-200/40 shadow-inner shrink-0">
             <button
               onClick={() => setViewType("grid")}
@@ -316,11 +311,11 @@ export default function History({ onClose, onSelect }) {
           </div>
         </div>
 
-        {/* Results Container (Independently scrollable with customized scrollbar) */}
+        {/* Results Container */}
         <div className="flex-1 overflow-y-auto pr-1 min-h-0 select-none scrollbar-premium">
           {paginatedItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 py-20 border border-dashed border-slate-200 rounded-[24px] bg-slate-50/20">
-              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-400 shadow-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-440 shadow-sm">
                 <RiSearchLine size={28} />
               </div>
               <div className="text-center">
@@ -428,10 +423,9 @@ export default function History({ onClose, onSelect }) {
           )}
         </div>
 
-        {/* Pagination (Sticky / Fixed at bottom) */}
+        {/* Pagination */}
         {filteredItems.length > 0 && (
           <div className="flex items-center justify-center gap-2 mt-6 border-t border-slate-100 pt-5 shrink-0">
-            {/* Prev Page Button */}
             <button
               onClick={handlePrevPage}
               disabled={activePage === 1}
@@ -444,7 +438,6 @@ export default function History({ onClose, onSelect }) {
               <RiArrowLeftSLine size={18} />
             </button>
 
-            {/* Render Page Numbers */}
             {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
               <button
                 key={page}
@@ -459,7 +452,6 @@ export default function History({ onClose, onSelect }) {
               </button>
             ))}
 
-            {/* Next Page Button */}
             <button
               onClick={handleNextPage}
               disabled={activePage === totalPages}
@@ -502,7 +494,6 @@ export default function History({ onClose, onSelect }) {
           }
         }
         
-        /* Premium custom scrollbar styling */
         .scrollbar-premium::-webkit-scrollbar {
           width: 6px;
         }

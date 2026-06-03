@@ -19,7 +19,7 @@ import {
   IMAGE_COUNTS,
   generationCost,
 } from "../../data/generateData";
-import History from "../../components/app/History";
+import History from "../../components/app/TextToImageHistory";
 import Dropdown from "../../components/app/Dropdown";
 import useTextToImage from "../../hooks/useTextToImage";
 import { useAppContext } from "../../context/app/AppContext";
