@@ -1,6 +1,7 @@
 import {
   generationCost,
   imageDimensions,
+  imageToImageCost,
 } from "../../config/modelCost.config.js";
 import ExpressError from "../../utils/ExpressError.js";
 
@@ -33,4 +34,23 @@ export const getGenerationDimensions = ({ size, quality }) => {
   const [width, height] = dimensions;
 
   return { width, height };
+};
+
+export const getImageToImageCost = ({
+  provider,
+  model,
+  quality,
+  numberOfImages,
+}) => {
+  const perImageCost =
+    imageToImageCost?.[provider]?.[model]?.[quality];
+
+  if (typeof perImageCost !== "number") {
+    throw new ExpressError(
+      400,
+      "Unsupported provider/model/quality combination",
+    );
+  }
+
+  return perImageCost * numberOfImages;
 };

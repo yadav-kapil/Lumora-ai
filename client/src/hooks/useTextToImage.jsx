@@ -25,14 +25,18 @@ const useTextToImage = () => {
       setIsLoading(true);
       setError("");
 
+      const formData = new FormData();
+      Object.entries(promptObj).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
       const res = await fetch("/api/generation/text-to-image", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
         credentials: "include",
-        body: JSON.stringify({ promptObj }),
+        body: formData,
       });
 
       const result = await res.json();

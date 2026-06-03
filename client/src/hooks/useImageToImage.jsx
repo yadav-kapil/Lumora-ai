@@ -21,7 +21,7 @@ const useImageToImage = () => {
       model,
       quality,
       numberOfImages,
-      currentCredits
+      currentCredits,
     );
 
     if (validationErrors.credits) {
@@ -36,14 +36,24 @@ const useImageToImage = () => {
       setIsLoading(true);
       setError("");
 
+      const formData = new FormData();
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "inputImages" && Array.isArray(value)) {
+          value.forEach((file) => {
+            formData.append("inputImages", file);
+          });
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value);
+        }
+      });
+
       const res = await fetch("/api/generation/image-to-image", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       const result = await res.json();
