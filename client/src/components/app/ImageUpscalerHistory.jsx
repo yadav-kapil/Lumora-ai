@@ -23,9 +23,9 @@ const ITEMS_PER_PAGE = 10;
 
 const SCALE_OPTIONS = [
   { id: "all", label: "All Targets" },
-  { id: "1k", label: "1K Resolution" },
-  { id: "2k", label: "2K Resolution" },
-  { id: "4k", label: "4K Resolution" },
+  { id: 1080, label: "1K Resolution" },
+  { id: 1440, label: "2K Resolution" },
+  { id: 2160, label: "4K Resolution" },
 ];
 
 const SORT_OPTIONS = [
@@ -49,9 +49,10 @@ const formatTimeAgo = (dateString) => {
 };
 
 const getScaleLabel = (scaleId) => {
-  if (scaleId === "1k") return "1K Target";
-  if (scaleId === "2k") return "2K Target";
-  if (scaleId === "4k") return "4K Target";
+  const num = Number(scaleId);
+  if (num === 1080) return "1K Target";
+  if (num === 1440) return "2K Target";
+  if (num === 2160) return "4K Target";
   return scaleId || "Unknown";
 };
 
@@ -105,7 +106,7 @@ export default function ImageUpscalerHistory({ onClose, onSelect }) {
       url: img.url,
       urls: itemImages ? itemImages.map((i) => i.url) : [],
       prompt: item.prompt || "",
-      scale: item.model || "", // saved as model in database schema
+      scale: item.target_resolution || 1080,
       premium: item.provider && item.provider !== "stock",
       createdAt: item.createdAt,
       timestamp: new Date(item.createdAt).getTime(),
@@ -116,7 +117,7 @@ export default function ImageUpscalerHistory({ onClose, onSelect }) {
   // Filter & Sort Logic
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.prompt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesScale = selectedScale === "all" || item.scale === selectedScale;
+    const matchesScale = selectedScale === "all" || Number(item.scale) === Number(selectedScale);
     return matchesSearch && matchesScale;
   }).sort((a, b) => {
     if (sortOrder === "newest") return b.timestamp - a.timestamp;

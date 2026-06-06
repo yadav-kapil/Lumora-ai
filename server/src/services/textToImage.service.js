@@ -1,7 +1,7 @@
 import { fal } from "@fal-ai/client";
 import { getGenerationDimensions } from "./generation.helpers.js";
-import ExpressError from "../../utils/ExpressError.js";
-import config from "../../config/config.js";
+import ExpressError from "../utils/ExpressError.js";
+import config from "../config/config.js";
 
 fal.config({
   credentials: config.FAL_KEY,

@@ -37,6 +37,21 @@ const userSchema = new mongoose.Schema(
       enum: ["free", "pro", "premium"],
       default: "free",
     },
+
+    profileUrl: {
+      type: String,
+      default: "",
+    },
+
+    enableNotification: {
+      type: Boolean,
+      default: true,
+    },
+
+    enableCommunity: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

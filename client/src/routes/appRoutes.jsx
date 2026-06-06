@@ -7,7 +7,7 @@ import SettingsPage from "../pages/app/SettingsPage";
 import BillingPage from "../pages/app/BillingPage";
 import ImageToImagePage from "../pages/app/ImageToImagePage";
 import UpscalerPage from "../pages/app/UpscalerPage";
-import VideoPage from "../pages/app/VideoPage";
+import RemoveBackground from "../pages/app/RemoveBackground";
 
 export const appRoutes = [
   {
@@ -23,8 +23,8 @@ export const appRoutes = [
     element: <UpscalerPage />,
   },
   {
-    path: "text-to-video",
-    element: <VideoPage />,
+    path: "remove-bg",
+    element: <RemoveBackground />,
   },
   {
     path: "history",

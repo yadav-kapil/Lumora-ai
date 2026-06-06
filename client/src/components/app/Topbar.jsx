@@ -11,13 +11,20 @@ import {
 } from "react-icons/ri";
 import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { useAppContext } from "../../context/app/AppContext";
+import NotificationPopover from "./NotificationPopover";
 
 export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
   const { user, dispatch } = useAuthContext();
+  const { notifications } = useAppContext();
   const credits = user?.credits ?? 0;
   const avatarLetter = user?.username ? user.username.charAt(0).toUpperCase() : "?";
   const [showMenu, setShowMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
+
+  const unreadCount = (notifications || []).filter((n) => !n.markByUsers.includes(user?._id)).length;
+  const hasUnread = unreadCount > 0;
 
   const handleLogout = async () => {
     try {
@@ -71,15 +78,26 @@ export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
           </button>
 
           {/* Notifications */}
-          <button className="group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white transition-all duration-200 hover:border-slate-300 hover:bg-slate-50">
-            <RiNotification3Line
-              size={18}
-              className="text-slate-600 group-hover:text-slate-800"
-            />
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowNotifications(!showNotifications);
+                setShowMenu(false);
+              }}
+              className="group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white transition-all duration-200 hover:border-slate-300 hover:bg-slate-50"
+            >
+              <RiNotification3Line
+                size={18}
+                className="text-slate-600 group-hover:text-slate-800"
+              />
 
-            {/* Notification Dot */}
-            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500"></span>
-          </button>
+              {/* Notification Dot */}
+              {hasUnread && (
+                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500"></span>
+              )}
+            </button>
+            <NotificationPopover isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+          </div>
 
           {/* Divider */}
           <div className="mx-1 h-5 w-px bg-slate-200" />
@@ -87,15 +105,22 @@ export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
           {/* Profile / Account */}
           <div className="relative">
             <button
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={() => {
+                setShowMenu(!showMenu);
+                setShowNotifications(false);
+              }}
               className="group flex cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50"
             >
               <div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-emerald-500 text-xs font-bold text-white shadow shadow-emerald-200">
-                <span>{avatarLetter}</span>
+                {user?.profileUrl ? (
+                  <img src={user.profileUrl} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <span>{avatarLetter}</span>
+                )}
               </div>
               <RiArrowDownSLine
                 size={14}
-                className={`text-slate-400 transition-transform duration-200 ${showMenu ? "rotate-180" : ""}`}
+                className={`text-slate-450 transition-transform duration-200 ${showMenu ? "rotate-180" : ""}`}
               />
             </button>
 
@@ -109,8 +134,12 @@ export default function TopBar({ sidebarCollapsed, setSidebarCollapsed }) {
             >
               {/* User info */}
               <div className="mb-1 flex items-center gap-2.5 rounded-xl bg-slate-50 p-2.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
-                  {avatarLetter}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white overflow-hidden">
+                  {user?.profileUrl ? (
+                    <img src={user.profileUrl} alt="Avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    <span>{avatarLetter}</span>
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-slate-800">

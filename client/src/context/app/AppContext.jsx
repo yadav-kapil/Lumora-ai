@@ -21,7 +21,24 @@ export const AppContextProvider = ({ children }) => {
       }
     };
 
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch(`/api/library/notification`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          dispatch({ type: "SET_NOTIFICATIONS", payload: data.notifications });
+        }
+      } catch (err) {
+        console.error("Failed to load notifications:", err);
+      }
+    };
+
     fetchHistory();
+    fetchNotifications();
   }, [isAuthenticated, accessToken]);
 
   return (

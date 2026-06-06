@@ -11,7 +11,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-
 const refreshTokenCookieBaseOptions = {
   httpOnly: true,
   secure: config.NODE_ENV === "production",
@@ -264,4 +263,69 @@ export const refreshAccessToken = wrapAsync(async (req, res) => {
       message: "Access Token Refreshed Successfully",
       accessToken,
     });
+});
+
+// update profile
+export const updateProfile = wrapAsync(async (req, res) => {
+  const { username, profileUrl } = req.body;
+  const userId = req.user._id;
+
+  if (!username || !username.trim()) {
+    throw new ExpressError(400, "Username is required");
+  }
+
+  const isUsernameTaken = await User.findOne({
+    username: username.trim(),
+    _id: { $ne: userId },
+  });
+
+  if (isUsernameTaken) {
+    throw new ExpressError(409, "Username is already taken");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ExpressError(404, "User not found");
+  }
+
+  user.username = username.trim();
+  user.profileUrl = profileUrl !== undefined ? profileUrl : user.profileUrl;
+  await user.save();
+
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
+  return res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    user: userResponse,
+  });
+});
+
+// update settings
+export const updateSetting = wrapAsync(async (req, res) => {
+  const { enableNotification, enableCommunity } = req.body;
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ExpressError(404, "User not found");
+  }
+
+  if (enableNotification !== undefined) {
+    user.enableNotification = enableNotification;
+  }
+  if (enableCommunity !== undefined) {
+    user.enableCommunity = enableCommunity;
+  }
+  await user.save();
+
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
+  return res.status(200).json({
+    success: true,
+    message: "Settings updated successfully",
+    user: userResponse,
+  });
 });

@@ -79,7 +79,6 @@ export default function HistoryPage() {
     ...(historyByType?.textToImage || []),
     ...(historyByType?.imageToImage || []),
     ...(historyByType?.imageUpscaler || []),
-    ...(historyByType?.video || []),
   ];
 
   const items = dbHistoryItems.flatMap((item) => {

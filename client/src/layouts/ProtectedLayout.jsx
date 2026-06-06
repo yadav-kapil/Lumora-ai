@@ -3,9 +3,8 @@ import { useAuthContext } from "../context/auth/AuthContext";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/app/Sidebar";
 import Topbar from "../components/app/Topbar";
-import Profile from "../components/app/Profile";
-import Setting from "../components/app/Setting";
 import { AppContextProvider } from "../context/app/AppContext";
+import GlobalLoading from "../components/app/GlobalLoading";
 
 const ProtectedLayout = () => {
   const { pathname } = useLocation();
@@ -50,8 +49,9 @@ const ProtectedLayout = () => {
         />
 
         {/* Dynamic page content */}
-        <main className="flex-1 pt-[72px]">
+        <main className="flex-1 pt-[72px] relative">
           <Outlet />
+          <GlobalLoading />
         </main>
       </div>
     </div>

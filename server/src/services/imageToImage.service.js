@@ -1,6 +1,6 @@
 import { fal } from "@fal-ai/client";
-import ExpressError from "../../utils/ExpressError.js";
-import config from "../../config/config.js";
+import ExpressError from "../utils/ExpressError.js";
+import config from "../config/config.js";
 
 fal.config({
   credentials: config.FAL_KEY,
@@ -45,7 +45,7 @@ export const buildFalImageToImageInput = (promptObj) => {
   );
 };
 
-export const generateImageToImageModel = async (promptObj) => {
+export const generateImageToImageFn = async (promptObj) => {
   const { provider, model } = promptObj;
   const endpoint = `fal-ai/${provider}/${model}`;
 

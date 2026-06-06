@@ -50,6 +50,26 @@ export const authReducer = (state, action) => {
         },
       };
 
+    case "UPDATE_PROFILE":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          username: action.payload.username,
+          profileUrl: action.payload.profileUrl,
+        },
+      };
+
+    case "UPDATE_SETTINGS":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          enableNotification: action.payload.enableNotification,
+          enableCommunity: action.payload.enableCommunity,
+        },
+      };
+
     default:
       return state;
   }

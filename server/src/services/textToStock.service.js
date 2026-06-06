@@ -1,6 +1,6 @@
 import { createClient } from "pexels";
-import config from "../../config/config.js";
-import ExpressError from "../../utils/ExpressError.js";
+import config from "../config/config.js";
+import ExpressError from "../utils/ExpressError.js";
 
 const client = createClient(config.STOCK_API_KEY);
 

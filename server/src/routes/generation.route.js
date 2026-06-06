@@ -5,6 +5,8 @@ import {
   generateImageToImage,
   getHistory,
   enhancePrompt,
+  imageUpscale,
+  removeBackground,
 } from "../controllers/generation.controller.js";
 import authenticate from "../middlewares/auth.middleware.js";
 
@@ -22,7 +24,13 @@ router.post(
   "/upscale",
   authenticate,
   upload.single("inputImage", 1),
-  generateImageToImage,
+  imageUpscale,
+);
+router.post(
+  "/removeBG",
+  authenticate,
+  upload.single("inputImage", 1),
+  removeBackground,
 );
 router.get("/history", authenticate, getHistory);
 router.post("/enhance", authenticate, enhancePrompt);

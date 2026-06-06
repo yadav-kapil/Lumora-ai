@@ -10,7 +10,7 @@ const generationSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["textToImage", "imageToImage", "imageUpscaler", "video"],
+      enum: ["textToImage", "imageToImage", "imageUpscaler", "removeBG"],
       default: "textToImage",
       required: true,
     },
@@ -66,6 +66,11 @@ const generationSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+
+        isFavourite: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
 
@@ -79,6 +84,11 @@ const generationSchema = new mongoose.Schema(
         publicId: {
           type: String,
           required: true,
+        },
+
+        isFavourite: {
+          type: Boolean,
+          default: false,
         },
       },
     ],

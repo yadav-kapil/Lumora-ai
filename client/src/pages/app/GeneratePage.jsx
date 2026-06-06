@@ -10,7 +10,12 @@ import {
   RiImageAddLine,
   RiDeleteBin6Line,
   RiCoinLine,
+  RiHeartFill,
+  RiHeartLine,
+  RiAddLine,
 } from "react-icons/ri";
+import useLibrary from "../../hooks/useLibrary";
+import AddToCollectionModal from "../../components/app/AddToCollectionModal";
 import {
   STYLES,
   SIZES,
@@ -44,6 +49,7 @@ export default function GeneratePage() {
   const [showHistory, setShowHistory] = useState(false);
   const [previewImg, setPreviewImg] = useState("");
   const [previewImgs, setPreviewImgs] = useState([]);
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
 
   const { user } = useAuthContext();
   const isFreePlan = !user || user.plan === "free";
@@ -58,7 +64,34 @@ export default function GeneratePage() {
       setError("");
     }
   }, [error, showToast, setError]);
-  const { historyByType, isLoading: isHistoryLoading } = useAppContext();
+  const { historyByType, isLoading: isHistoryLoading, fullHistory } = useAppContext();
+  const { markFavourite } = useLibrary();
+
+  const currentGenItem = (fullHistory || []).find((item) =>
+    (item.outputImageUrls || item.imageUrls || []).some((img) => img.url === previewImg)
+  );
+  const isFav = currentGenItem
+    ? (currentGenItem.outputImageUrls || currentGenItem.imageUrls || []).find((img) => img.url === previewImg)?.isFavourite || false
+    : false;
+
+  const handleToggleFavorite = async () => {
+    if (!previewImg || !currentGenItem) return;
+    const newFavState = !isFav;
+    const result = await markFavourite({
+      generationId: currentGenItem._id,
+      imageUrl: previewImg,
+      isFavourite: newFavState,
+    });
+    if (result.success) {
+      showToast(
+        newFavState ? "Added to your favorites." : "Removed from your favorites.",
+        "success",
+        newFavState ? "Marked as Favorite" : "Removed Favorite"
+      );
+    } else {
+      showToast(result.message, "error", "Favorite Update Failed");
+    }
+  };
 
   const providerCost =
     generationCost[promptObj.provider]?.[promptObj.model]?.[promptObj.size]?.[
@@ -423,9 +456,33 @@ export default function GeneratePage() {
               </p>
             </div>
 
-            <button className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 cursor-pointer">
-              {ratio.previewLabel}
-            </button>
+            {previewImg && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleToggleFavorite}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-rose-500 hover:border-slate-300 hover:shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  title={isFav ? "Remove from Favorites" : "Add to Favorites"}
+                >
+                  {isFav ? (
+                    <RiHeartFill
+                      size={14}
+                      className="text-rose-500 animate-[bounce_0.3s_ease-out]"
+                    />
+                  ) : (
+                    <RiHeartLine size={14} />
+                  )}
+                </button>
+                {currentGenItem && (
+                  <button
+                    onClick={() => setShowCollectionModal(true)}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-emerald-500 hover:border-slate-300 hover:shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title="Add to Collection"
+                  >
+                    <RiAddLine size={16} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-5">
@@ -452,11 +509,13 @@ export default function GeneratePage() {
                     className="absolute inset-0 h-full w-full object-cover animate-fade-in"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
-                    <RiSparklingFill size={10} className="text-emerald-400" />
-                    <span className="text-[10px] font-semibold tracking-wide text-white">
-                      AI GENERATED
-                    </span>
+                  <div className="absolute top-3 left-3 z-20">
+                    <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
+                      <RiSparklingFill size={10} className="text-emerald-400" />
+                      <span className="text-[10px] font-semibold tracking-wide text-white">
+                        AI GENERATED
+                      </span>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -619,6 +678,22 @@ export default function GeneratePage() {
           }}
         />
       )}
+
+      {(() => {
+        const activeImgObj = currentGenItem
+          ? [...(currentGenItem.inputImageUrls || []), ...(currentGenItem.outputImageUrls || [])].find((img) => img.url === previewImg)
+          : null;
+        const imageId = activeImgObj?._id;
+
+        return showCollectionModal && currentGenItem && (
+          <AddToCollectionModal
+            generationId={currentGenItem._id}
+            imageUrl={previewImg}
+            imageId={imageId}
+            onClose={() => setShowCollectionModal(false)}
+          />
+        );
+      })()}
 
       <style>{`
         @keyframes shimmer {

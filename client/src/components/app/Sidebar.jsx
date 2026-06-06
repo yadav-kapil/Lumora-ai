@@ -4,7 +4,7 @@ import {
   RiSparklingFill,
   RiImage2Line,
   RiAspectRatioLine,
-  RiVideoLine,
+  RiEraserLine,
   RiHistoryLine,
   RiHeartLine,
   RiFolderLine,
@@ -71,14 +71,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           path: "/app/image-upscaler",
         },
         {
-          id: "text-to-video",
-          label: "Text to Video",
+          id: "remove-bg",
+          label: "Remove BG",
           icon: (
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8b5cf6] text-white shrink-0 shadow-sm shadow-purple-200">
-              <RiVideoLine size={14} />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500 text-white shrink-0 shadow-sm shadow-indigo-200">
+              <RiEraserLine size={14} />
             </div>
           ),
-          path: "/app/text-to-video",
+          path: "/app/remove-bg",
         },
       ],
     },
@@ -205,7 +205,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                     className={`shrink-0 flex items-center justify-center transition-colors ${
                       isActive &&
                       !item.id.includes("image") &&
-                      !item.id.includes("video")
+                      !item.id.includes("remove-bg")
                         ? "text-emerald-500"
                         : "text-slate-400 group-hover:text-slate-600"
                     }`}

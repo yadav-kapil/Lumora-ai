@@ -9,6 +9,7 @@ import { globalLimiter } from "./middlewares/rateLimiter.middleware.js";
 //Routers Modules
 import authRoutes from "./routes/user.routes.js";
 import generationRoutes from "./routes/generation.route.js";
+import libraryRoutes from "./routes/library.routes.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api", globalLimiter);
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/generation", generationRoutes);
+app.use("/api/library", libraryRoutes);
 
 // error handlers
 app.use((req, res, next) => {

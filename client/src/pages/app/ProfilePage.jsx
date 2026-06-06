@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   RiUser3Line,
   RiMailLine,
@@ -9,20 +9,77 @@ import {
   RiUploadCloud2Line,
 } from "react-icons/ri";
 import { useAuthContext } from "../../context/auth/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { useLoading } from "../../context/LoadingContext";
 
 export default function ProfilePage() {
-  const { user } = useAuthContext();
+  const { user, accessToken, dispatch } = useAuthContext();
   const [username, setUsername] = useState(user?.username || "");
   const [email] = useState(user?.email || "");
-  const [avatarLetter, setAvatarLetter] = useState(
-    user?.username ? user.username.charAt(0).toUpperCase() : "?",
-  );
-  const [saved, setSaved] = useState(false);
+  const [profileUrl, setProfileUrl] = useState(user?.profileUrl || "");
 
-  const handleSave = (e) => {
+  const fileInputRef = useRef(null);
+  const { showToast } = useToast();
+  const { showLoading, hideLoading } = useLoading();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("File size exceeds 2MB limit", "error", "File Too Large");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (!username.trim()) {
+      showToast("Username is required", "warning", "Validation Error");
+      return;
+    }
+
+    try {
+      showLoading("Saving Profile", "Updating your profile information...");
+      const res = await fetch("/api/auth/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: username.trim(),
+          profileUrl,
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        showToast(result.message || "Failed to update profile", "error", "Update Failed");
+        return;
+      }
+
+      dispatch({
+        type: "UPDATE_PROFILE",
+        payload: {
+          username: result.user.username,
+          profileUrl: result.user.profileUrl,
+        },
+      });
+
+      showToast("Profile updated successfully!", "success", "Profile Updated");
+    } catch (err) {
+      showToast(err.message || "An error occurred while updating profile", "error", "Operation Failed");
+    } finally {
+      hideLoading();
+    }
   };
 
   return (
@@ -45,17 +102,15 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {saved && (
-          <div className="mb-6 p-3 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 animate-[fadeIn_0.2s_ease-out]">
-            Profile saved successfully!
-          </div>
-        )}
-
         <form onSubmit={handleSave} className="space-y-6">
           {/* Avatar Upload */}
           <div className="flex items-center gap-5 pb-2">
-            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-emerald-400 text-2xl font-black text-white shadow-lg border-4 border-white">
-              <span>{avatarLetter}</span>
+            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-emerald-400 text-2xl font-black text-white shadow-lg border-4 border-white overflow-hidden">
+              {profileUrl ? (
+                <img src={profileUrl} alt="Avatar" className="h-full w-full object-cover" />
+              ) : (
+                <span>{username ? username.charAt(0).toUpperCase() : "?"}</span>
+              )}
             </div>
             <div>
               <h4 className="text-sm font-bold text-slate-800">
@@ -65,16 +120,24 @@ export default function ProfilePage() {
                 PNG or JPG. Max size 2MB
               </p>
               <div className="flex items-center gap-2 mt-2.5">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-650 shadow-sm hover:bg-slate-50 cursor-pointer"
                 >
                   <RiUploadCloud2Line size={13} />
                   Upload
                 </button>
                 <button
                   type="button"
-                  onClick={() => setAvatarLetter("?")}
+                  onClick={() => setProfileUrl("")}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-red-500 shadow-sm hover:bg-red-50 cursor-pointer"
                 >
                   Remove

@@ -9,7 +9,12 @@ import {
   RiVipCrownFill,
   RiDeleteBin6Line,
   RiHistoryLine,
+  RiHeartFill,
+  RiHeartLine,
+  RiAddLine,
 } from "react-icons/ri";
+import useLibrary from "../../hooks/useLibrary";
+import AddToCollectionModal from "../../components/app/AddToCollectionModal";
 import { useAuthContext } from "../../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MODELS } from "../../data/imageToImageData";
@@ -33,8 +38,11 @@ export default function ImageToImagePage() {
     setError,
   } = useImageToImage();
 
-  const { historyByType, isLoading: isHistoryLoading } = useAppContext();
+  const { historyByType, isLoading: isHistoryLoading, fullHistory } = useAppContext();
+  const { markFavourite } = useLibrary();
+
   const [showHistory, setShowHistory] = useState(false);
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
 
   const [uploadedImages, setUploadedImages] = useState([]); // Array of { id, file, preview }
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
@@ -48,6 +56,32 @@ export default function ImageToImagePage() {
   const [quality, setQuality] = useState("normal");
   const [numberOfImages, setNumberOfImages] = useState(1);
   const fileInputRef = useRef(null);
+
+  const currentGenItem = (fullHistory || []).find((item) =>
+    (item.outputImageUrls || item.imageUrls || []).some((img) => img.url === resultImg)
+  );
+  const isFav = currentGenItem
+    ? (currentGenItem.outputImageUrls || currentGenItem.imageUrls || []).find((img) => img.url === resultImg)?.isFavourite || false
+    : false;
+
+  const handleToggleFavorite = async () => {
+    if (!resultImg || !currentGenItem) return;
+    const newFavState = !isFav;
+    const result = await markFavourite({
+      generationId: currentGenItem._id,
+      imageUrl: resultImg,
+      isFavourite: newFavState,
+    });
+    if (result.success) {
+      showToast(
+        newFavState ? "Added to your favorites." : "Removed from your favorites.",
+        "success",
+        newFavState ? "Marked as Favorite" : "Removed Favorite"
+      );
+    } else {
+      showToast(result.message, "error", "Favorite Update Failed");
+    }
+  };
 
   useEffect(() => {
     if (error) {
@@ -398,13 +432,43 @@ export default function ImageToImagePage() {
         <div className="flex flex-col gap-6">
           {/* Preview Card */}
           <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 md:p-8 shadow-[0_10px_40px_rgba(15,23,42,0.03)] backdrop-blur-xl flex flex-col gap-5">
-            <div>
-              <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">
-                Output Preview
-              </h3>
-              <p className="text-xs text-slate-400 mb-5">
-                Preview of the transformed output image
-              </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1">
+                  Output Preview
+                </h3>
+                <p className="text-xs text-slate-400 mb-5">
+                  Preview of the transformed output image
+                </p>
+              </div>
+
+              {resultImg && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleToggleFavorite}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-rose-500 hover:border-slate-300 hover:shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title={isFav ? "Remove from Favorites" : "Add to Favorites"}
+                  >
+                    {isFav ? (
+                      <RiHeartFill
+                        size={14}
+                        className="text-rose-500 animate-[bounce_0.3s_ease-out]"
+                      />
+                    ) : (
+                      <RiHeartLine size={14} />
+                    )}
+                  </button>
+                  {currentGenItem && (
+                    <button
+                      onClick={() => setShowCollectionModal(true)}
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-emerald-500 hover:border-slate-300 hover:shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                      title="Add to Collection"
+                    >
+                      <RiAddLine size={16} />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-5 select-none transition-all duration-300">
@@ -423,11 +487,13 @@ export default function ImageToImagePage() {
                     className="max-h-[380px] w-auto max-w-full object-contain rounded-[24px]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
-                    <RiSparklingFill size={10} className="text-blue-400" />
-                    <span className="text-[10px] font-semibold tracking-wide text-white">
-                      AI GENERATED
-                    </span>
+                  <div className="absolute top-3 left-3 z-20">
+                    <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
+                      <RiSparklingFill size={10} className="text-blue-400" />
+                      <span className="text-[10px] font-semibold tracking-wide text-white">
+                        AI GENERATED
+                      </span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -590,6 +656,22 @@ export default function ImageToImagePage() {
           }}
         />
       )}
+
+      {(() => {
+        const activeImgObj = currentGenItem
+          ? [...(currentGenItem.inputImageUrls || []), ...(currentGenItem.outputImageUrls || [])].find((img) => img.url === resultImg)
+          : null;
+        const imageId = activeImgObj?._id;
+
+        return showCollectionModal && currentGenItem && (
+          <AddToCollectionModal
+            generationId={currentGenItem._id}
+            imageUrl={resultImg}
+            imageId={imageId}
+            onClose={() => setShowCollectionModal(false)}
+          />
+        );
+      })()}
     </div>
   );
 }

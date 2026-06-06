@@ -2,8 +2,10 @@ import {
   generationCost,
   imageDimensions,
   imageToImageCost,
-} from "../../config/modelCost.config.js";
-import ExpressError from "../../utils/ExpressError.js";
+  imageUpscaleCost,
+  removeBGCost,
+} from "../config/modelCost.config.js";
+import ExpressError from "../utils/ExpressError.js";
 
 export const getTotalGenerationCost = ({
   provider,
@@ -53,4 +55,30 @@ export const getImageToImageCost = ({
   }
 
   return perImageCost * numberOfImages;
+};
+
+export const getUpscaleCost = (resolution) => {
+  const cost = imageUpscaleCost[resolution];
+
+  if (typeof cost !== "number") {
+    throw new ExpressError(
+      400,
+      `Unsupported upscale resolution: ${resolution}`,
+    );
+  }
+
+  return cost;
+};
+
+export const getRemoveBGCost = () => {
+  const cost = removeBGCost.default;
+
+  if (typeof cost !== "number") {
+    throw new ExpressError(
+      400,
+      "Unsupported BG removal option",
+    );
+  }
+
+  return cost;
 };

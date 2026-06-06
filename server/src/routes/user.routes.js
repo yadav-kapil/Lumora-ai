@@ -8,6 +8,8 @@ import {
   getMe,
   logoutUser,
   refreshAccessToken,
+  updateProfile,
+  updateSetting,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();
@@ -19,6 +21,10 @@ router.post("/login", strictLimiter, loginUser);
 router.post("/logout", protectCsrf, logoutUser);
 
 router.get("/me", authenticate, getMe);
+
+router.put("/profile", authenticate, updateProfile);
+
+router.put("/setting", authenticate, updateSetting);
 
 router.post("/refresh-token", strictLimiter, protectCsrf, refreshAccessToken);
 

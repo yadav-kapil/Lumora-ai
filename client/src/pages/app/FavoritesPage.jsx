@@ -1,27 +1,94 @@
-import { useState } from "react";
-import { RiHeartFill, RiHeartLine, RiDownloadLine, RiHistoryLine } from "react-icons/ri";
-
-const MOCK_FAVORITES = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
-    prompt: "Scenic alpine lake with high pine trees reflecting on pristine blue water, morning mist.",
-    timeAgo: "15 min ago",
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1515621061946-eff1c2a352bd?w=500&q=80",
-    prompt: "Cyberpunk neon street at night, glowing storefront signs, reflections in rain puddles.",
-    timeAgo: "32 min ago",
-  },
-];
+import { useState, useEffect } from "react";
+import { RiHeartFill, RiHeartLine, RiDownloadLine, RiHistoryLine, RiSparklingFill } from "react-icons/ri";
+import { useToast } from "../../context/ToastContext";
+import useLibrary from "../../hooks/useLibrary";
+import { downloadImage } from "../../utils/downloadHelper";
+import { useAuthContext } from "../../context/auth/AuthContext";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState(MOCK_FAVORITES);
+  const [dbHistoryItems, setDbHistoryItems] = useState([]);
+  const { showToast } = useToast();
+  const { getFavourites, markFavourite, isLoading } = useLibrary();
+  const { accessToken } = useAuthContext();
 
-  const handleRemove = (id) => {
-    setFavorites((prev) => prev.filter((item) => item.id !== id));
+  const fetchFavorites = async () => {
+    const result = await getFavourites();
+    if (result && result.success) {
+      setDbHistoryItems(result.data || []);
+    } else {
+      showToast(result.message || "Failed to load favorites", "error", "Error Loading");
+    }
   };
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchFavorites();
+    }
+  }, [accessToken]);
+
+  const handleRemove = async (generationId, imageUrl) => {
+    const result = await markFavourite({
+      generationId,
+      imageUrl,
+      isFavourite: false,
+    });
+    if (result && result.success) {
+      showToast("Removed from your favorites successfully.", "success", "Favorite Removed");
+      // Update local state to filter it out immediately
+      setDbHistoryItems((prev) =>
+        prev.map((item) => {
+          if (item._id !== generationId) return item;
+          return {
+            ...item,
+            inputImageUrls: (item.inputImageUrls || []).map((img) =>
+              img.url === imageUrl ? { ...img, isFavourite: false } : img
+            ),
+            outputImageUrls: (item.outputImageUrls || []).map((img) =>
+              img.url === imageUrl ? { ...img, isFavourite: false } : img
+            ),
+          };
+        })
+      );
+    } else {
+      showToast(result.message || "Failed to remove favorite", "error", "Removal Failed");
+    }
+  };
+
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return "unknown";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "Yesterday";
+    return `${diffDays} days ago`;
+  };
+
+  // Extract all images marked as favorite
+  const items = dbHistoryItems.flatMap((item) => {
+    const inputs = (item.inputImageUrls || []).filter(img => img.isFavourite).map((img, index) => ({
+      id: `${item._id}_in_${index}`,
+      generationId: item._id,
+      url: img.url,
+      prompt: item.prompt || "Input image",
+      timeAgo: formatTimeAgo(item.createdAt),
+      type: item.type || "textToImage",
+    }));
+    const outputs = (item.outputImageUrls || []).filter(img => img.isFavourite).map((img, index) => ({
+      id: `${item._id}_out_${index}`,
+      generationId: item._id,
+      url: img.url,
+      prompt: item.prompt || "Output image",
+      timeAgo: formatTimeAgo(item.createdAt),
+      type: item.type || "textToImage",
+    }));
+    return [...inputs, ...outputs];
+  });
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -43,9 +110,13 @@ export default function FavoritesPage() {
           </div>
         </div>
 
-        {favorites.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 border border-dashed border-slate-200 rounded-[24px] bg-slate-50/20">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 text-rose-400">
+        {isLoading && items.length === 0 ? (
+          <div className="flex items-center justify-center py-24">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-500 border-t-transparent" />
+          </div>
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-24 border border-dashed border-slate-200 rounded-[24px] bg-slate-55/20">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 text-rose-450 shadow-inner">
               <RiHeartLine size={28} />
             </div>
             <div className="text-center">
@@ -55,28 +126,31 @@ export default function FavoritesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {favorites.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="group relative aspect-square overflow-hidden rounded-[24px] border border-slate-150 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                 <img src={item.url} alt="" className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
                 {/* Heart Toggle */}
                 <button
-                  onClick={() => handleRemove(item.id)}
-                  className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white text-rose-500 shadow-sm hover:scale-110 active:scale-90 transition-all cursor-pointer"
+                  onClick={() => handleRemove(item.generationId, item.url)}
+                  className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white text-rose-500 shadow-sm hover:scale-110 active:scale-90 transition-all cursor-pointer z-10"
                 >
-                  <RiHeartFill size={16} />
+                  <RiHeartFill size={16} className="animate-[bounce_0.3s_ease-out]" />
                 </button>
 
                 {/* Info & Download */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                   <div className="flex items-center gap-1.5 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-bold text-white">
                     <RiHistoryLine size={10} />
                     <span>{item.timeAgo}</span>
                   </div>
-                  <a href={item.url} download className="flex h-8 w-8 items-center justify-center rounded-xl bg-white hover:bg-emerald-500 hover:text-white transition-all shadow">
+                  <button
+                    onClick={() => downloadImage(item.url, `lumora-favourite-${item.id}.jpg`)}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-white hover:bg-emerald-500 hover:text-white transition-all shadow cursor-pointer"
+                  >
                     <RiDownloadLine size={14} className="text-slate-800 hover:text-inherit" />
-                  </a>
+                  </button>
                 </div>
 
                 {/* Prompt Tooltip */}

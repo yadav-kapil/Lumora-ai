@@ -58,3 +58,13 @@ export const imageToImageCost = {
     },
   },
 };
+
+export const imageUpscaleCost = {
+  1080: 10,
+  1440: 20,
+  2160: 40,
+};
+
+export const removeBGCost = {
+  default: 15,
+};
