@@ -42,7 +42,7 @@ export default function NotificationPopover({ isOpen, onClose }) {
 
   return (
     <div
-      className={`absolute right-0 top-13 z-50 w-80 max-h-[400px] overflow-y-auto rounded-2xl border border-slate-100 bg-white/95 p-3 shadow-[0_8px_40px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-all duration-300 ease-out ${
+      className={`fixed right-4 left-4 top-[76px] sm:absolute sm:right-0 sm:left-auto sm:top-13 sm:w-80 z-50 max-h-[400px] overflow-y-auto rounded-2xl border border-slate-100 bg-white/95 p-3 shadow-[0_8px_40px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-all duration-300 ease-out ${
         isOpen
           ? "visible translate-y-0 scale-100 opacity-100 pointer-events-auto"
           : "invisible -translate-y-3 scale-95 opacity-0 pointer-events-none"

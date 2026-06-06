@@ -30,7 +30,7 @@ const protectCsrf = (req, res, next) => {
     throw new ExpressError(403, "Invalid request origin");
   }
 
-  if (requestOrigin !== config.CLIENT_ORIGIN) {
+  if (!config.CLIENT_ORIGIN.includes(requestOrigin)) {
     throw new ExpressError(403, "CSRF validation failed");
   }
 

@@ -51,7 +51,7 @@ const config = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN.trim(),
+  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN.split(",").map((url) => url.trim()),
   NODE_ENV: process.env.NODE_ENV,
 
   STOCK_API_KEY: process.env.STOCK_API_KEY,

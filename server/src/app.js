@@ -16,7 +16,13 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: config.CLIENT_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin || config.CLIENT_ORIGIN.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
