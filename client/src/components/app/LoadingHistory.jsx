@@ -3,7 +3,7 @@ import React from "react";
 export default function LoadingHistory() {
   return (
     <div className="loading-history grid grid-cols-1 gap-5 bg-slate-50/70 p-3 sm:p-5 lg:grid-cols-2 lg:gap-6 lg:p-6 animate-pulse">
-      {/* LEFT SKELETON */}
+      
       <div className="flex flex-col gap-7 rounded-[28px] border border-slate-200/70 bg-white/95 p-7 shadow-[0_10px_40px_rgba(15,23,42,0.04)] backdrop-blur-xl">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-2xl bg-slate-200" />
@@ -40,7 +40,7 @@ export default function LoadingHistory() {
         </div>
       </div>
 
-      {/* RIGHT SKELETON */}
+      
       <div className="flex flex-col gap-6">
         <div className="rounded-[28px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.04)] backdrop-blur-xl flex flex-col gap-4">
           <div className="h-4 w-24 rounded bg-slate-200" />

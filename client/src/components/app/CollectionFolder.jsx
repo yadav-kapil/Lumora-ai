@@ -19,25 +19,25 @@ export default function CollectionFolder({ collection, onBack }) {
   const { showToast } = useToast();
   const { markFavourite, removeFromCollection } = useLibrary();
 
-  // Track active context menu card index
+  
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
 
-  // Removal Confirmation Modal State
+  
   const [removeConfirmId, setRemoveConfirmId] = useState(null);
 
-  // Close menus on click outside
+  
   useEffect(() => {
     const handleOutsideClick = () => setActiveMenuIndex(null);
     window.addEventListener("click", handleOutsideClick);
     return () => window.removeEventListener("click", handleOutsideClick);
   }, []);
 
-  // Helper to extract image details from the populated structure
+  
   const getImgDetails = (item) => {
     const gen = item.generationId;
     const genId = gen?._id || gen;
 
-    // Retrieve from global context state first to ensure reactivity
+    
     const globalGen = (fullHistory || []).find((h) => h._id === genId);
     const activeGen = globalGen || gen;
 

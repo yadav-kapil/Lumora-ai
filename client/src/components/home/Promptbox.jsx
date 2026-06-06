@@ -59,7 +59,7 @@ const Promptbox = () => {
       </motion.h1>
 
       <section className="flex max-lg:flex-col lg:gap-16 justify-start max-lg:items-center w-full mt-10 z-0">
-        {/* LEFT COLUMN */}
+        
         <motion.div
           initial={{ opacity: 0, filter: "blur(12px)" }}
           whileInView={{ opacity: 1, filter: "blur(0px)" }}

@@ -27,7 +27,7 @@ const Footer = () => {
         transition={{ duration: 0.6 }}
         className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-10"
       >
-        {/* LEFT */}
+        
         <div className="w-full md:w-[25%] space-y-4">
           <div className="flex items-center gap-2">
             <BiImageAlt className="text-green-600 text-2xl" />
@@ -55,11 +55,11 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* RIGHT */}
+        
         <div className="w-full md:w-[75%] flex flex-col md:flex-row gap-10 md:gap-20">
-          {/* LINKS + HELP */}
+          
           <div className="flex  w-full md:justify-end gap-10 md:gap-20">
-            {/* QUICK LINKS */}
+            
             <div className="w-1/2 sm:w-auto">
               <h2 className="font-semibold mb-3">Explore</h2>
               <ul className="space-y-2 text-sm">
@@ -77,7 +77,7 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* HELP */}
+            
             <div className="w-1/2 sm:w-auto">
               <h2 className="font-semibold mb-3">Legal</h2>
               <ul className="space-y-2 text-sm">
@@ -96,7 +96,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* NEWSLETTER */}
+          
           <div className="max-w-[300px] w-full sm:w-[300px]">
             <h2 className="font-semibold mb-3">Stay Updated</h2>
             <p className="text-gray-500 text-sm mb-3">
@@ -117,7 +117,7 @@ const Footer = () => {
         </div>
       </motion.div>
 
-      {/* BOTTOM LINE */}
+      
       <div className="max-w-7xl mx-auto h-px bg-gray-300"></div>
 
       <div className="text-center text-gray-500 text-xs py-4 flex justify-between max-w-7xl mx-auto px-6">
@@ -125,7 +125,7 @@ const Footer = () => {
               <span>SYSTUMM</span>
       </div>
 
-      {/* BIG BACKGROUND TEXT */}
+      
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}

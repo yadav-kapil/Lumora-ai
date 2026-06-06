@@ -20,7 +20,7 @@ import {
 export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
 
-  // Manage reactivity through React state
+  
   const [activeTab, setActiveTab] = useState("text-to-image");
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   const menuGroups = [
     {
-      // Group 1: Generation tools
+      
       title: null,
       items: [
         {
@@ -83,7 +83,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       ],
     },
     {
-      // Group 2: Library
+      
       title: "LIBRARY",
       items: [
         {
@@ -107,7 +107,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       ],
     },
     {
-      // Group 3: Account
+      
       title: "ACCOUNT",
       items: [
         {

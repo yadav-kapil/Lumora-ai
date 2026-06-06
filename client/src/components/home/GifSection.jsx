@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 const GifSection = () => {
   return (
     <section className="flex flex-col items-center px-6 sm:px-18 py-12 md:py-14 max-w-7xl mx-auto w-full">
-      {/* HEADING */}
+      
       <motion.h1
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -18,7 +18,7 @@ const GifSection = () => {
         with <span className="text-green-600">Lumora.ai</span>
       </motion.h1>
 
-      {/* CONTENT */}
+      
       <motion.div 
         initial={{ opacity: 0, scale: 0.98, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -26,13 +26,13 @@ const GifSection = () => {
         transition={{ duration: 0.7, delay: 0.1 }}
         className="relative w-full flex flex-col gap-4 items-center justify-center mt-8 md:mt-12 max-w-4xl"
       >
-        {/* IMAGE CARD */}
+        
         <div className="max-w-4xl md:pr-8 rounded-2xl">
           <motion.img
             src={gif}
             alt="AI generation demo"
             animate={{
-              y: [0, -40, 0, 60, 0], // up-down float
+              y: [0, -40, 0, 60, 0], 
             }}
             transition={{
               duration: 3,
@@ -48,7 +48,7 @@ const GifSection = () => {
           />
         </div>
 
-        {/* VERTICAL TEXT (Desktop only) */}
+        
         <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-full">
           <p className="[writing-mode:vertical-rl] md:text-2xl lg:text-3xl text-gray-700">
             <span className="text-gray-900">Creative</span>{" "}

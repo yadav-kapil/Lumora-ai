@@ -10,12 +10,12 @@ export default function AddToCollectionModal({ onClose, generationId, imageUrl, 
   const [isLoadingCollections, setIsLoadingCollections] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Modal mode: "existing" or "new"
+  
   const [mode, setMode] = useState("existing");
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
   const [newCollectionName, setNewCollectionName] = useState("");
 
-  // Block Background Scrolling when modal is open
+  
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
@@ -24,7 +24,7 @@ export default function AddToCollectionModal({ onClose, generationId, imageUrl, 
     };
   }, []);
 
-  // Fetch user's collections to populate the dropdown
+  
   useEffect(() => {
     const fetchCollectionsList = async () => {
       setIsLoadingCollections(true);
@@ -36,7 +36,7 @@ export default function AddToCollectionModal({ onClose, generationId, imageUrl, 
         if (list.length > 0) {
           setSelectedCollectionId(list[0]._id);
         } else {
-          // If no collections, default to "new" mode
+          
           setMode("new");
         }
       }

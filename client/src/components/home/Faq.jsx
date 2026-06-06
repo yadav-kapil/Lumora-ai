@@ -11,7 +11,7 @@ const Faq = () => {
 
   return (
     <div className="flex flex-col items-center px-6 sm:px-12 py-12 lg:py-16 max-w-7xl mx-auto w-full">
-      {/* HEADING */}
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -19,7 +19,7 @@ const Faq = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center gap-3 mb-12"
       >
-        {/* Eyebrow pill */}
+        
         <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-green-200 bg-green-50">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           <span className="text-[11px] font-semibold tracking-[0.13em] uppercase text-green-600">
@@ -27,7 +27,7 @@ const Faq = () => {
           </span>
         </div>
 
-        {/* Title */}
+        
         <h1 className="text-center font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight">
           Frequently Asked{" "}
           <span className="text-green-600 relative inline-block">
@@ -36,7 +36,7 @@ const Faq = () => {
           </span>
         </h1>
 
-        {/* Subtitle */}
+        
         <p className="text-sm text-gray-500 max-w-sm text-center leading-relaxed mt-1">
           Everything you need to know. Can&apos;t find an answer?{" "}
           <NavLink
@@ -48,9 +48,9 @@ const Faq = () => {
         </p>
       </motion.div>
 
-      {/* MAIN LAYOUT */}
+      
       <div className="flex flex-col lg:flex-row w-full gap-12 items-start">
-        {/* LEFT - LOTTIE */}
+        
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -66,7 +66,7 @@ const Faq = () => {
           />
         </motion.div>
 
-        {/* RIGHT - FAQ LIST */}
+        
         <div className="flex flex-3 flex-col gap-[14px] w-full">
           {faqData.map((faq, index) => {
             const isOpen = openIndex === index;

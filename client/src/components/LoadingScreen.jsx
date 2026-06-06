@@ -25,20 +25,20 @@ const LoadingScreen = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7fff9] px-4">
-      {/* Background glow */}
+      
       <div className="absolute left-[-120px] top-[-120px] h-[300px] w-[300px] rounded-full bg-green-400/10 blur-3xl sm:h-[420px] sm:w-[420px]" />
 
       <div className="absolute bottom-[-120px] right-[-120px] h-[260px] w-[260px] rounded-full bg-emerald-300/10 blur-3xl sm:h-[360px] sm:w-[360px]" />
 
-      {/* Grid overlay */}
+      
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:34px_34px] sm:bg-[size:42px_42px]" />
 
-      {/* Main card */}
+      
       <div className="relative z-10 flex w-full max-w-[95%] flex-col items-center rounded-[28px] border border-white/70 bg-white/70 px-5 py-7 shadow-[0_20px_80px_rgba(16,24,40,0.08)] backdrop-blur-2xl sm:max-w-lg sm:rounded-[34px] sm:px-8 sm:py-10">
-        {/* subtle shine */}
+        
         <div className="absolute inset-0 rounded-[28px] bg-[linear-gradient(120deg,rgba(255,255,255,0.65),rgba(255,255,255,0.15))] sm:rounded-[34px]" />
 
-        {/* Badge */}
+        
         <div className="relative mb-4 flex items-center gap-2 rounded-full border border-green-100 bg-green-50 px-3 py-1.5 text-[10px] font-semibold tracking-[0.18em] text-green-700 shadow-sm sm:mb-5 sm:px-4 sm:text-xs">
           <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
@@ -49,9 +49,9 @@ const LoadingScreen = () => {
           AI ENGINE INITIALIZING
         </div>
 
-        {/* Animation */}
+        
         <div className="relative -mb-2 -mt-2 flex w-full items-center justify-center">
-          {/* glow */}
+          
           <div className="absolute h-[140px] w-[140px] rounded-full bg-green-400/10 blur-3xl sm:h-[180px] sm:w-[180px]" />
 
           <DotLottieReact
@@ -62,7 +62,7 @@ const LoadingScreen = () => {
           />
         </div>
 
-        {/* Brand */}
+        
         <div className="relative text-center">
           <h1 className="text-[32px] font-black tracking-[-0.04em] text-slate-900 sm:text-[42px]">
             Lumora
@@ -76,9 +76,9 @@ const LoadingScreen = () => {
           </p>
         </div>
 
-        {/* Progress section */}
+        
         <div className="relative mt-7 w-full sm:mt-9">
-          {/* top labels */}
+          
           <div className="mb-3 flex items-center justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:text-xs">
               Loading Modules
@@ -89,7 +89,7 @@ const LoadingScreen = () => {
             </p>
           </div>
 
-          {/* Progress bar */}
+          
           <div className="relative h-2.5 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/70 sm:h-3">
             <div
               className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 transition-all duration-75"

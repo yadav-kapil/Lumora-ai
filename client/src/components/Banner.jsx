@@ -9,7 +9,7 @@ const Banner = ({ setShowBanner }) => {
 
       <span>Grab Now !!</span>
 
-      {/* Close Button */}
+      
       <button
         onClick={() => setShowBanner(false)}
         className="absolute right-4 text-green-800 hover:text-black hover:scale-110 transition border border-slate-300 rounded-md px-2 py-1 cursor-pointer"
