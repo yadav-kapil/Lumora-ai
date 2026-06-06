@@ -48,10 +48,7 @@ const Login = () => {
           {/* LOGO */}
           <NavLink to="/" className="flex items-center gap-2.5 group">
             {/* ICON */}
-            <div className="relative w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center shadow-[0_8px_20px_rgba(34,197,94,0.28)] group-hover:shadow-[0_10px_24px_rgba(34,197,94,0.38)] group-hover:scale-[1.04] transition-all duration-200">
-              <Sparkles className="w-4 h-4 text-white" />
-              <div className="absolute inset-0 rounded-xl bg-white/10" />
-            </div>
+            <img src="/logo-lumora-ai.png" alt="Lumora Logo" className="w-9 h-9 object-contain rounded-xl group-hover:scale-[1.04] transition-all duration-200" />
 
             {/* TEXT */}
             <div className="leading-none">

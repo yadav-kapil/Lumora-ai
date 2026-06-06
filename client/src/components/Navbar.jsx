@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { BiImageAlt } from "react-icons/bi";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/auth/AuthContext";
@@ -36,9 +35,7 @@ const Navbar = ({ showBanner }) => {
     >
       <nav className="flex items-center justify-between px-6 py-1 md:py-2 shadow-sm max-w-5xl rounded-full mx-auto w-full bg-white/50 border border-gray-300/20 md:backdrop-blur-sm">
         <NavLink to="/" className="flex items-center gap-2 select-none">
-          <div className="px-1.5 py-1 rounded-lg bg-green-100">
-            <BiImageAlt className="text-green-600 text-lg" />
-          </div>
+          <img src="/logo-lumora-ai.png" alt="Lumora Logo" className="w-8 h-8 object-contain rounded-lg" />
           <div className="flex gap-0.5">
             <span className="text-gray-900 font-semibold text-lg tracking-tight">
               Lumora

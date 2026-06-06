@@ -143,19 +143,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* Top Logo Area */}
       <div className="flex h-[72px] items-center justify-between px-5">
         <div className="flex items-center gap-3 overflow-hidden">
-                  {!collapsed && (
-                      <>
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-200/50">
-            <RiSparklingFill size={18} />
-          </div>
-          
+          <img src="/logo-lumora-ai.png" alt="Lumora Logo" className="w-10 h-10 object-contain rounded-xl shrink-0" />
+          {!collapsed && (
             <span
               className="text-lg font-bold tracking-tight text-slate-900"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               Lumora<span className="text-emerald-500">.ai</span>
-                          </span>
-                          </>
+            </span>
           )}
         </div>
 

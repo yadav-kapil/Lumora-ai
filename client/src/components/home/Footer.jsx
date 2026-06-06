@@ -1,4 +1,3 @@
-import { BiImageAlt } from "react-icons/bi";
 import { FaXTwitter, FaLinkedin, FaGithub } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { motion } from "motion/react";
@@ -30,7 +29,7 @@ const Footer = () => {
         
         <div className="w-full md:w-[25%] space-y-4">
           <div className="flex items-center gap-2">
-            <BiImageAlt className="text-green-600 text-2xl" />
+            <img src="/logo-lumora-ai.png" alt="Lumora Logo" className="w-8 h-8 object-contain rounded-lg" />
             <h1 className="text-2xl font-semibold">
               <span>Lumora.</span>
               <span className="text-green-500">ai</span>
